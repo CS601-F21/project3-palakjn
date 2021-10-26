@@ -1,6 +1,6 @@
 package applications.search.controller;
 
-import applications.Constants;
+import applications.search.configuration.Constants;
 import server.Handler;
 
 public class ReviewSearchHandler implements Handler {
