@@ -1,12 +1,13 @@
-package server;
+package server.controller;
 
+import server.HttpConstants;
+import server.models.HttpRequest;
+import server.models.HttpResponse;
 import utils.Strings;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -21,7 +22,7 @@ public class HTTPServer {
 
     public HTTPServer(int port) {
         this.port = port;
-        handlers = new HashMap<String, Handler>();
+        handlers = new HashMap<>();
         this.threadPool = Executors.newFixedThreadPool(30);
     }
 
@@ -63,66 +64,57 @@ public class HTTPServer {
             String requestLine = inStream.readLine();
             System.out.println("Request: " + requestLine);
 
-            boolean isValidRequest = validateRequest(requestLine, writer);
+            HttpResponse httpResponse = new HttpResponse(writer, inStream);
+
+            boolean isValidRequest = validateRequest(requestLine, httpResponse);
 
             if(isValidRequest) {
+                HttpRequest httpRequest = new HttpRequest();
+
                 //Reading method, path, version
                 String[] requestLineParts = requestLine.split("\\s");
-                String method = requestLineParts[0];
-                String path = requestLineParts[1];
-                String version = requestLineParts[2];
+                httpRequest.setMethod(requestLineParts[0]);
+                httpRequest.setPath(requestLineParts[1]);
+                httpRequest.setVersion(requestLineParts[2]);
 
-                System.out.println("HTTP method: "+ method);
-                System.out.println("Path: " + path);
-                System.out.println("Version: " + version);
+                System.out.println("HTTP method: "+ httpRequest.getMethod());
+                System.out.println("Path: " + httpRequest.getPath());
+                System.out.println("Version: " + httpRequest.getVersion());
 
                 //Read headers
-                Map<String, String> headers = getHeader(inStream);
+                httpRequest.setHeaders(getHeader(inStream));
 
-                if(method.equals(HttpConstants.GET)) {
-                    handleRequest(path, writer, null);
-                }
-                else if(method.equals(HttpConstants.POST)) {
-                    int contentLength = Integer.parseInt(headers.getOrDefault(HttpConstants.CONTENT_LENGTH, "0"));
-
-                    if(contentLength != 0) {
-                        String content = extractContent(inStream, contentLength);
-                        handleRequest(path, writer, content);
-                    }
-                    else {
-                        ServerUtils.send411(writer);
-                    }
-                }
+                handlers.get(httpRequest.getPath()).handle(httpRequest, httpResponse);
             }
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
     }
 
-    private boolean validateRequest(String request, PrintWriter writer) {
+    private boolean validateRequest(String request, HttpResponse response) {
         boolean isValid = false;
 
         if(Strings.isNullOrEmpty(request)) {
-            ServerUtils.send400(writer);
+            response.setStatus(400);
         }
         else {
             String[] requestLineParts = request.split("\\s");
 
             if(requestLineParts.length != 3) {
                 //Bad Request
-                ServerUtils.send400(writer);
+                response.setStatus(400);
             }
             else if(!requestLineParts[0].equals(HttpConstants.GET) && !requestLineParts[0].equals(HttpConstants.POST)) {
                 //Method not supported
-                ServerUtils.send405(writer);
+                response.setStatus(405);
             }
             else if(!handlers.containsKey(requestLineParts[1])) {
                 //Page not found
-                ServerUtils.send404(writer);
+                response.setStatus(404);
             }
             else if(!requestLineParts[2].equals(HttpConstants.VERSION)) {
                 //version not supported
-                ServerUtils.send505(writer);
+                response.setStatus(505);
             }
             else {
                 isValid = true;
@@ -142,25 +134,5 @@ public class HTTPServer {
         }
 
         return headers;
-    }
-
-    private String extractContent(BufferedReader inStream, int contentLength) throws IOException {
-        char[] bodyArr = new char[contentLength];
-        inStream.read(bodyArr, 0, bodyArr.length);
-
-        String encodedBody = new String(bodyArr);
-        return URLDecoder.decode(encodedBody.substring(encodedBody.indexOf("=") + 1), StandardCharsets.UTF_8.toString());
-    }
-
-    private void handleRequest(String path, PrintWriter writer, String body) {
-        String page = handlers.get(path).handle(body);
-        if(!Strings.isNullOrEmpty(page)) {
-            ServerUtils.send200(writer);
-            writer.println(page);
-        }
-        else {
-            //No content to send to client
-            ServerUtils.send204(writer);
-        }
     }
 }

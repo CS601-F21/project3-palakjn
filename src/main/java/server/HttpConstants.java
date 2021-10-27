@@ -1,18 +1,13 @@
 package server;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class HttpConstants {
     public static final String GET = "GET";
     public static final String POST = "POST";
+
     public static final String VERSION = "HTTP/1.1";
-
-    public static final String OK = "200 OK";
-    public static final String NOT_FOUND = "404 Not Found";
-    public static final String NOT_ALLOWED = "405 Method Not Allowed";
-    public static final String BAD_REQUEST = "400 Bad Request";
-    public static final String LENGTH_REQUIRED = "411 Length Required";
-    public static final String VERSION_NOT_SUPPORTED = "505 HTTP Version Not Supported";
-    public static final String NO_CONTENT = "204 No Content";
-
     public static final String CONTENT_LENGTH = "Content-Length:";
     public static final String CONNECTION_CLOSE = "Connection: close";
 
@@ -27,4 +22,16 @@ public class HttpConstants {
             "\n" +
             "</body>\n" +
             "</html>";
+
+    public static Map<Integer, String> STATUS_CODE = new HashMap<>();
+
+    public HttpConstants() {
+        STATUS_CODE.put(200, "200 OK");
+        STATUS_CODE.put(404, "404 Not Found");
+        STATUS_CODE.put(405, "405 Method Not Allowed");
+        STATUS_CODE.put(400, "400 Bad Request");
+        STATUS_CODE.put(411, "411 Length Required");
+        STATUS_CODE.put(505, "505 HTTP Version Not Supported");
+        STATUS_CODE.put(204, "No Content");
+    }
 }

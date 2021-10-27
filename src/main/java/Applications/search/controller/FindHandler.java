@@ -1,7 +1,13 @@
 package applications.search.controller;
 
 import applications.search.configuration.SearchConstants;
-import server.Handler;
+import server.HttpConstants;
+import server.controller.Handler;
+import server.models.HttpRequest;
+import server.models.HttpResponse;
+import utils.Strings;
+
+import java.io.IOException;
 
 public class FindHandler implements Handler {
     private DataProcessor dataProcessor;
@@ -11,19 +17,41 @@ public class FindHandler implements Handler {
     }
 
     @Override
-    public String handle(String data) {
-        String output = null;
+    public void handle(HttpRequest request, HttpResponse response) throws IOException {
+        if(request.isGET()) {
+            doGet(request, response);
+        }
+        else if(request.isPOST()) {
+            doPost(request, response);
+        }
+    }
 
-        if(data == null || data.isBlank() || data.isEmpty()) {
-            //Get call
-            output = SearchConstants.FIND_FORM;
+    private void doGet(HttpRequest request, HttpResponse response) {
+        response.setStatus(200);
+        response.send(SearchConstants.FIND_FORM);
+    }
+
+    private void doPost(HttpRequest request, HttpResponse response) throws IOException {
+        int contentLength = 0;
+        String header = request.getHeader(HttpConstants.CONTENT_LENGTH);
+
+        if(!Strings.isNullOrEmpty(header)) {
+            contentLength = Integer.parseInt(header);
+
+            String body = response.read(contentLength);
+            String content = dataProcessor.findAsin(body);
+
+            if(!Strings.isNullOrEmpty(content)) {
+                response.setStatus(200);
+                response.send(String.format(SearchConstants.FIND_ASIN_RESPONSE, content));
+            }
+            else {
+                //No content to display
+                response.setStatus(204);
+            }
         }
         else {
-            //POST call
-            String content = dataProcessor.findAsin(data);
-            output = String.format(SearchConstants.FIND_ASIN_RESPONSE, content);
+            response.setStatus(411);
         }
-
-        return  output;
     }
 }

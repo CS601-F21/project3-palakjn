@@ -5,7 +5,7 @@ import applications.search.configuration.SearchConfig;
 import applications.search.controller.DataProcessor;
 import applications.search.controller.FindHandler;
 import applications.search.controller.ReviewSearchHandler;
-import server.HTTPServer;
+import server.controller.HTTPServer;
 import utils.JsonManager;
 import utils.Strings;
 
@@ -64,7 +64,7 @@ public class SearchApplication {
 
     private void startServer() {
         HTTPServer server = new HTTPServer(SearchConstants.PORT);
-        server.addMapping(SearchConstants.REVIEW_SERACH_URI, new ReviewSearchHandler());
+        server.addMapping(SearchConstants.REVIEW_SEARCH_URI, new ReviewSearchHandler());
         server.addMapping(SearchConstants.FIND_URI, new FindHandler());
         server.startup();
     }
