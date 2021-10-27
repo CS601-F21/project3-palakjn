@@ -1,6 +1,6 @@
 package applications.search.controller;
 
-import applications.search.configuration.Constants;
+import applications.search.configuration.SearchConstants;
 import applications.search.models.InvertedIndex;
 
 /**
@@ -13,13 +13,13 @@ public class Factory {
      * @param type Either REVIEW or QA
      * @return Instance of Inverted Index
      */
-    public static InvertedIndex getIndex(Constants.Type type) {
+    public static InvertedIndex getIndex(SearchConstants.Type type) {
         InvertedIndex index = null;
 
-        if(type == Constants.Type.REVIEW) {
+        if(type == SearchConstants.Type.REVIEW) {
             index = IndexCreator.getReviewIndex();
         }
-        else if(type == Constants.Type.QA) {
+        else if(type == SearchConstants.Type.QA) {
             index = IndexCreator.getQaIndex();
         }
 

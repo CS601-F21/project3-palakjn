@@ -1,6 +1,6 @@
 package applications.search.controller;
 
-import applications.search.configuration.Constants;
+import applications.search.configuration.SearchConstants;
 import applications.search.models.*;
 import utils.JsonManager;
 import utils.Strings;
@@ -22,12 +22,12 @@ import java.util.*;
  */
 public class DataProcessor {
 
-    private ReviewList reviewList;
-    private QAList qaList;
+    private static ReviewList reviewList = new ReviewList();
+    private static QAList qaList = new QAList();
 
     public DataProcessor() {
-        reviewList = new ReviewList();
-        qaList = new QAList();
+//        reviewList = new ReviewList();
+//        qaList = new QAList();
     }
 
     /**
@@ -48,7 +48,7 @@ public class DataProcessor {
 
                 if(review != null && !Strings.isNullOrEmpty(review.getReviewText())) {
                     reviewList.add(index, review);
-                    process(review.getReviewText(), index, Constants.Type.REVIEW);
+                    process(review.getReviewText(), index, SearchConstants.Type.REVIEW);
                     index++;
                 }
 
@@ -85,7 +85,7 @@ public class DataProcessor {
 
                 if(qa != null && !Strings.isNullOrEmpty(qa.getQuestion()) && !Strings.isNullOrEmpty(qa.getAnswer())) {
                     qaList.add(index, qa);
-                    process(String.format("%s %s", qa.getQuestion(), qa.getAnswer()), index, Constants.Type.QA);
+                    process(String.format("%s %s", qa.getQuestion(), qa.getAnswer()), index, SearchConstants.Type.QA);
                     index++;
                 }
 
@@ -137,11 +137,10 @@ public class DataProcessor {
      * term if "isPartial" value is false else will display a list of all reviews
      * where any word in it contains a partial match of the term.
      * @param term One word term
-     * @param isPartial To indicate whether to search for exact term or partial match of the term.
      */
-    public String reviewSearch(String term, boolean isPartial) {
-        InvertedIndex reviewIndex = Factory.getIndex(Constants.Type.REVIEW);
-        List<Integer> documentList = reviewIndex.get(term, isPartial);
+    public String reviewSearch(String term) {
+        InvertedIndex reviewIndex = Factory.getIndex(SearchConstants.Type.REVIEW);
+        List<Integer> documentList = reviewIndex.get(term);
         StringBuilder stringBuilder = new StringBuilder();
 
         if(documentList != null && documentList.size() > 0) {
@@ -151,12 +150,7 @@ public class DataProcessor {
                 String output = reviewList.toString(documentIndex);
 
                 if(!Strings.isNullOrEmpty(output)) {
-                    if (isPartial) {
-                        stringBuilder.append(String.format("<p>%d) %s. </p>\n", numbering, output));
-                    } else {
-                        stringBuilder.append(String.format("<p>%d) %s.</p>\n", numbering, output));
-                        stringBuilder.append(String.format("<p>%d) %s.</p>\n", numbering, output));
-                    }
+                    stringBuilder.append(String.format("<p>%d) %s.</p>\n", numbering, output));
                     numbering++;
                 }
             }
@@ -174,7 +168,7 @@ public class DataProcessor {
      * @param index An index of document having the text.
      * @param type Indicated whether text is from review object or from QA object.
      */
-    private void process(String text, int index, Constants.Type type) {
+    private void process(String text, int index, SearchConstants.Type type) {
         InvertedIndex invertedIndex = Factory.getIndex(type);
         //Making all characters in a string as lowercase.
         text = text.toLowerCase();

@@ -3,7 +3,7 @@ package server;
 public class HttpConstants {
     public static final String GET = "GET";
     public static final String POST = "POST";
-    public static final String VERSION = "HTTP/1.0";
+    public static final String VERSION = "HTTP/1.1";
 
     public static final String OK = "200 OK";
     public static final String NOT_FOUND = "404 Not Found";

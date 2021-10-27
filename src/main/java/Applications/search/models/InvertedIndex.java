@@ -1,9 +1,6 @@
 package applications.search.models;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Maintains a data structure which maps terms to the documents where those terms appear.
@@ -11,7 +8,7 @@ import java.util.Map;
  * @author Palak Jain
  */
 public class InvertedIndex {
-    private HashMap<String, List<Integer>> wordMap;
+    private HashMap<String, HashSet<Integer>> wordMap;
 
     public InvertedIndex() {
         wordMap = new HashMap<>();
@@ -23,31 +20,22 @@ public class InvertedIndex {
      * @param documentIndex Holding an index of the actual document where the term exists.
      */
     public void upsert(String key, int documentIndex) {
-        List<Integer> documentRefs = wordMap.getOrDefault(key, new ArrayList<>());
-        if(!documentRefs.contains(documentIndex)) {
-            //Not inserting if already captures that the document contains the term.
-            documentRefs.add(documentIndex);
-            wordMap.put(key, documentRefs);
-        }
+        HashSet<Integer> documentRefs = wordMap.getOrDefault(key, new HashSet<>());
+        documentRefs.add(documentIndex);
+        wordMap.put(key, documentRefs);
     }
 
     /**
      * Gets all the documents where the given term exists.
      * @param term One word term
-     * @param isPartial
      * @return
      */
-    public List<Integer> get(String term, boolean isPartial) {
+    public List<Integer> get(String term) {
         List<Integer> documents = new ArrayList<>();
 
-        if(!isPartial) {
-            documents = wordMap.getOrDefault(term, null);
-        }
-        else {
-            for (Map.Entry<String, List<Integer>> entry : wordMap.entrySet()) {
-                if(entry.getKey().contains(term)) {
-                    documents.addAll(entry.getValue());
-                }
+        for (Map.Entry<String, HashSet<Integer>> entry : wordMap.entrySet()) {
+            if(entry.getKey().contains(term)) {
+                documents.addAll(entry.getValue());
             }
         }
 

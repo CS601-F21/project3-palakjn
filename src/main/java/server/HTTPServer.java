@@ -45,8 +45,8 @@ public class HTTPServer {
                 Socket socket = server.accept();
                 System.out.println("New connection from " + socket.getInetAddress());
 
-                //threadPool.execute(() -> handleRequest(socket));
-                handleRequest(socket);
+                threadPool.execute(() -> handleRequest(socket));
+                //TODO: shutdown thread at the end
             }
         } catch (IOException ioException) {
             StringWriter writer = new StringWriter();

@@ -1,10 +1,13 @@
 package utils;
 
+import applications.search.configuration.SearchConfig;
 import applications.search.models.QA;
 import applications.search.models.Review;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+
+import java.io.Reader;
 
 /**
  * Parse Json into objects.
@@ -49,5 +52,25 @@ public class JsonManager {
         }
 
         return qa;
+    }
+
+    /**
+     * Parse JSON string into Configuration object
+     * @param reader Reader object
+     * @return Config object
+     */
+    public static SearchConfig fromJsonToConfig(Reader reader) {
+        Gson gson = new Gson();
+
+        SearchConfig config = null;
+
+        try {
+            config = gson.fromJson(reader, SearchConfig.class);
+        }
+        catch (JsonSyntaxException exception) {
+            System.out.println("Unable to parse json");
+        }
+
+        return config;
     }
 }
