@@ -9,29 +9,19 @@ import utils.Strings;
 
 import java.io.IOException;
 
-public class FindHandler implements Handler {
+public class FindHandler extends Handler {
     private DataProcessor dataProcessor;
 
     public FindHandler() {
         dataProcessor = new DataProcessor();
     }
 
-    @Override
-    public void handle(WebRequest request, WebResponse response) throws IOException {
-        if(request.isGET()) {
-            doGet(request, response);
-        }
-        else if(request.isPOST()) {
-            doPost(request, response);
-        }
-    }
-
-    private void doGet(WebRequest request, WebResponse response) {
+    public void doGet(WebRequest request, WebResponse response) {
         response.setStatus(200);
         response.send(SearchConstants.FIND_FORM);
     }
 
-    private void doPost(WebRequest request, WebResponse response) throws IOException {
+    public void doPost(WebRequest request, WebResponse response) throws IOException {
         int contentLength = 0;
         String header = request.getHeader(HttpConstants.CONTENT_LENGTH);
 

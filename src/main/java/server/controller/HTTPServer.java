@@ -95,6 +95,7 @@ public class HTTPServer {
         boolean isValid = false;
 
         if(Strings.isNullOrEmpty(request)) {
+            System.out.println("Bad Request. Request empty");
             response.setStatus(400);
         }
         else {
@@ -102,18 +103,22 @@ public class HTTPServer {
 
             if(requestLineParts.length != 3) {
                 //Bad Request
+                System.out.println("Bad Request");
                 response.setStatus(400);
             }
             else if(!requestLineParts[0].equals(HttpConstants.GET) && !requestLineParts[0].equals(HttpConstants.POST)) {
                 //Method not supported
+                System.out.println("Method not supported");
                 response.setStatus(405);
             }
             else if(!handlers.containsKey(requestLineParts[1])) {
                 //Page not found
+                System.out.println("Page not found");
                 response.setStatus(404);
             }
             else if(!requestLineParts[2].equals(HttpConstants.VERSION)) {
                 //version not supported
+                System.out.println("Version not supported");
                 response.setStatus(505);
             }
             else {

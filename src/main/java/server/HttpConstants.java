@@ -25,7 +25,7 @@ public class HttpConstants {
 
     public static Map<Integer, String> STATUS_CODE = new HashMap<>();
 
-    public HttpConstants() {
+    static {
         STATUS_CODE.put(200, "200 OK");
         STATUS_CODE.put(404, "404 Not Found");
         STATUS_CODE.put(405, "405 Method Not Allowed");
