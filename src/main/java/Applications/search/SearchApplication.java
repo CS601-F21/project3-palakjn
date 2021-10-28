@@ -5,6 +5,7 @@ import applications.search.configuration.SearchConfig;
 import applications.search.controller.DataProcessor;
 import applications.search.controller.FindHandler;
 import applications.search.controller.ReviewSearchHandler;
+import configuration.Config;
 import server.controller.HTTPServer;
 import utils.JsonManager;
 import utils.Strings;
@@ -94,8 +95,8 @@ public class SearchApplication {
      * @param configFileLocation location of configuration file
      */
     private void readConfig(String configFileLocation) {
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(configFileLocation))){
-            configuration = JsonManager.fromJsonToConfig(reader);
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(configFileLocation))) {
+            configuration = JsonManager.fromJson(reader, Config.class).getSearch();
         }
         catch (IOException ioException) {
             StringWriter writer = new StringWriter();

@@ -6,21 +6,13 @@ public class SearchConstants {
     public static int PORT = 8080;
 
     //Path
-    public static String REVIEW_SERACH_URI = "/reviewsearch";
+    public static String REVIEW_SEARCH_URI = "/reviewsearch";
     public static String FIND_URI = "/find";
 
     public enum Type {
         REVIEW,
         QA
     }
-
-    //Choices from End User
-    public static String FIND = "find";
-    public static String REVIEWSEARCH = "reviewsearch";
-    public static String QASEARCH = "qasearch";
-    public static String REVIEWPARTIALSEARCH = "reviewpartialsearch";
-    public static String QAPARTIALSEARCH = "qapartialsearch";
-    public static String EXIT = "exit";
 
     //XHTML pages
     public static final String REVIEW_SEARCH_FORM = "<!DOCTYPE html>\n" +

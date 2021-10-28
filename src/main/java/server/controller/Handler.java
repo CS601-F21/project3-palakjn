@@ -1,11 +1,11 @@
 package server.controller;
 
-import server.models.HttpRequest;
-import server.models.HttpResponse;
+import server.models.WebRequest;
+import server.models.WebResponse;
 
 import java.io.IOException;
 
 public interface Handler {
 
-    public void handle(HttpRequest request, HttpResponse response) throws IOException;
+    public void handle(WebRequest request, WebResponse response) throws IOException;
 }

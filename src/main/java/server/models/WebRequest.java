@@ -4,13 +4,12 @@ import server.HttpConstants;
 
 import java.util.Map;
 
-public class HttpRequest {
+public class WebRequest {
 
     private String method;
     private String path;
     private String version;
     private Map<String, String> headers;
-    private String body;
 
     public String getMethod() {
         return method;
@@ -22,14 +21,6 @@ public class HttpRequest {
 
     public String getVersion() {
         return version;
-    }
-
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
-
-    public String getBody() {
-        return body;
     }
 
     public void setMethod(String method) {
@@ -46,10 +37,6 @@ public class HttpRequest {
 
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
     }
 
     public boolean isGET() {

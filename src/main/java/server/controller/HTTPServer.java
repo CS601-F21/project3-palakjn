@@ -1,8 +1,8 @@
 package server.controller;
 
 import server.HttpConstants;
-import server.models.HttpRequest;
-import server.models.HttpResponse;
+import server.models.WebRequest;
+import server.models.WebResponse;
 import utils.Strings;
 
 import java.io.*;
@@ -64,12 +64,12 @@ public class HTTPServer {
             String requestLine = inStream.readLine();
             System.out.println("Request: " + requestLine);
 
-            HttpResponse httpResponse = new HttpResponse(writer, inStream);
+            WebResponse webResponse = new WebResponse(writer, inStream);
 
-            boolean isValidRequest = validateRequest(requestLine, httpResponse);
+            boolean isValidRequest = validateRequest(requestLine, webResponse);
 
             if(isValidRequest) {
-                HttpRequest httpRequest = new HttpRequest();
+                WebRequest httpRequest = new WebRequest();
 
                 //Reading method, path, version
                 String[] requestLineParts = requestLine.split("\\s");
@@ -84,14 +84,14 @@ public class HTTPServer {
                 //Read headers
                 httpRequest.setHeaders(getHeader(inStream));
 
-                handlers.get(httpRequest.getPath()).handle(httpRequest, httpResponse);
+                handlers.get(httpRequest.getPath()).handle(httpRequest, webResponse);
             }
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }
     }
 
-    private boolean validateRequest(String request, HttpResponse response) {
+    private boolean validateRequest(String request, WebResponse response) {
         boolean isValid = false;
 
         if(Strings.isNullOrEmpty(request)) {

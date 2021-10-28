@@ -44,7 +44,7 @@ public class DataProcessor {
             String line = br.readLine();
 
             while (line != null) {
-                Review review = JsonManager.getReviewObject(line);
+                Review review = JsonManager.fromJson(line, Review.class);
 
                 if(review != null && !Strings.isNullOrEmpty(review.getReviewText())) {
                     reviewList.add(index, review);
@@ -81,7 +81,7 @@ public class DataProcessor {
             String line = br.readLine();
 
             while (line != null) {
-                QA qa = JsonManager.getQAObject(line);
+                QA qa = JsonManager.fromJson(line, QA.class);
 
                 if(qa != null && !Strings.isNullOrEmpty(qa.getQuestion()) && !Strings.isNullOrEmpty(qa.getAnswer())) {
                     qaList.add(index, qa);

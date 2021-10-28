@@ -8,12 +8,12 @@ import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-public class HttpResponse {
+public class WebResponse {
 
     private PrintWriter writer;
     private BufferedReader reader;
 
-    public HttpResponse(PrintWriter writer, BufferedReader reader) {
+    public WebResponse(PrintWriter writer, BufferedReader reader) {
         this.writer = writer;
         this.reader = reader;
     }
