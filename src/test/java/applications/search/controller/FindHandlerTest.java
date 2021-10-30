@@ -21,7 +21,7 @@ public class FindHandlerTest {
     }
 
     @Test
-    public void doGet_ValidInputs_sendValidResponse() {
+    public void doGet_validInputs_sendValidResponse() {
         WebRequest webRequest = new WebRequest();
         StringWriter actualStringWriter = new StringWriter();
         WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter), null);
@@ -39,7 +39,7 @@ public class FindHandlerTest {
                 "</head>\n" +
                 "<body>\n" +
                 "<form class=\"form\" action=\"/find\" method=\"post\">\n" +
-                "<input type=\"text\" name=\"find\" placeholder=\"ASIN Number\"></input><br />\n" +
+                "<input type=\"text\" name=\"asin\" placeholder=\"ASIN Number\"></input><br />\n" +
                 "<button  type\"submit\">Search</button>\n" +
                 "</form>\n" +
                 "</body>\n" +
@@ -90,7 +90,7 @@ public class FindHandlerTest {
                     "</head>\n" +
                     "<body>\n" +
                     "<form class=\"form\" action=\"/find\" method=\"post\">\n" +
-                    "<input type=\"text\" name=\"find\" placeholder=\"ASIN Number\"></input><br />\n" +
+                    "<input type=\"text\" name=\"asin\" placeholder=\"ASIN Number\"></input><br />\n" +
                     "<button  type\"submit\">Search</button>\n" +
                     "</form><br /><br /><br />\n" +
                     "<h3>Asin number: 12345. Reviews: </h3><br />\n" +

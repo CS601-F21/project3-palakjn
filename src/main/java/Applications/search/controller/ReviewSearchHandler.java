@@ -29,7 +29,7 @@ public class ReviewSearchHandler extends Handler {
             contentLength = Integer.parseInt(header);
 
             String body = response.read(contentLength);
-            String content = dataProcessor.reviewSearch(body);
+            String content = dataProcessor.reviewSearch(body.toLowerCase().replaceAll("[^a-z0-9]", ""));
 
             if(!Strings.isNullOrEmpty(content)) {
                 response.setStatus(200);

@@ -20,9 +20,11 @@ import java.nio.file.Paths;
 public class SearchApplication {
     private SearchConfig configuration;
     private DataProcessor dataProcessor;
+    private HTTPServer httpServer;
 
-    public SearchApplication(){
-        dataProcessor = new DataProcessor();
+    public SearchApplication() {
+        this.dataProcessor = new DataProcessor();
+        this.httpServer = new HTTPServer(SearchConstants.PORT);
     }
 
     public static void main(String[] args) {
@@ -64,10 +66,13 @@ public class SearchApplication {
     }
 
     private void startServer() {
-        HTTPServer server = new HTTPServer(SearchConstants.PORT);
-        server.addMapping(SearchConstants.REVIEW_SEARCH_URI, new ReviewSearchHandler());
-        server.addMapping(SearchConstants.FIND_URI, new FindHandler());
-        server.startup();
+        this.httpServer.addMapping(SearchConstants.REVIEW_SEARCH_URI, new ReviewSearchHandler());
+        this.httpServer.addMapping(SearchConstants.FIND_URI, new FindHandler());
+        this.httpServer.startup();
+    }
+
+    private void shutdown() {
+        this.httpServer.shutdown();
     }
 
     /**

@@ -1,12 +1,16 @@
 package applications.search;
 
 import applications.search.configuration.SearchConfig;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.Socket;
 
 public class SearchApplicationTest {
     private SearchApplication searchApplication = new SearchApplication();
@@ -111,7 +115,7 @@ public class SearchApplicationTest {
     }
 
     @Test
-    public void verifyConfig_validConfig_returnFalse() {
+    public void verifyConfig_validConfig_returnTrue() {
         initConfig(new SearchConfig("Cell_Phones_and_Accessories_5.json", "qa_Cell_Phones_and_Accessories.json"));
 
         try {
@@ -123,11 +127,6 @@ public class SearchApplicationTest {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException exception) {
             System.err.println(exception.getMessage());
         }
-    }
-
-    @Test
-    public void testSearchApplication() {
-        initConfig(new SearchConfig("Cell_Phones_and_Accessories_5.json", "qa_Cell_Phones_and_Accessories.json"));
     }
 
     private void initConfig(SearchConfig searchConfig) {

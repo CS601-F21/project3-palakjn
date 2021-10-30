@@ -21,7 +21,7 @@ public class ReviewSearchHandlerTest {
     }
 
     @Test
-    public void doGet_ValidInputs_sendValidResponse() {
+    public void doGet_validInputs_sendValidResponse() {
         WebRequest webRequest = new WebRequest();
         StringWriter actualStringWriter = new StringWriter();
         WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter), null);

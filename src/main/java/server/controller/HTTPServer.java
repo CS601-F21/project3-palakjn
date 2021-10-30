@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class HTTPServer {
 
@@ -19,6 +20,8 @@ public class HTTPServer {
     private volatile boolean running = true;
     private int port;
     private ExecutorService threadPool;
+    private ServerSocket serverSocket;
+    private Socket socket;
 
     public HTTPServer(int port) {
         this.port = port;
@@ -38,21 +41,53 @@ public class HTTPServer {
     }
 
     public void startup() {
-        try (ServerSocket server = new ServerSocket(port)) {
-            System.out.println("Server listening on port " + port);
+        try {
+            this.serverSocket = new ServerSocket(port);
+        } catch (IOException ioException) {
+            System.out.println("Fail to create server socket object. " + ioException.getMessage());
 
-            while (running) {
+            return;
+        }
+
+        System.out.println("Server listening on port " + port);
+
+        while (running) {
+            try {
                 //accept a new connection
-                Socket socket = server.accept();
+                this.socket = serverSocket.accept();
                 System.out.println("New connection from " + socket.getInetAddress());
 
                 threadPool.execute(() -> handleRequest(socket));
-                //TODO: shutdown thread at the end
+            } catch(IOException ioException){
+                StringWriter writer = new StringWriter();
+                ioException.printStackTrace(new PrintWriter(writer));
+                System.out.println("Error while handling a request from client. Exception: " + writer);
+            }
+        }
+    }
+
+    public void shutdown() {
+        running = false;
+
+        threadPool.shutdown();
+
+        try {
+            if(!threadPool.awaitTermination(2, TimeUnit.MINUTES)) {
+                threadPool.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            System.err.println("Error while terminating threadpool: " + e.getMessage());
+        }
+
+        try {
+            //After closing the socket, thread will wake up from the socket.accept() call and then will exit the loop
+            this.serverSocket.close();
+            if(this.socket != null) {
+                //When there is no remote host, then socket will be null.
+                this.socket.close();
             }
         } catch (IOException ioException) {
-            StringWriter writer = new StringWriter();
-            ioException.printStackTrace(new PrintWriter(writer));
-            System.out.println("Error while handling a request from client. Exception: "+ writer);
+            System.out.printf("Error while closing the remote connection. %s.\n", ioException);
         }
     }
 
