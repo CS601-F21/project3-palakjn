@@ -25,11 +25,6 @@ public class DataProcessor {
     private static ReviewList reviewList = new ReviewList();
     private static QAList qaList = new QAList();
 
-    public DataProcessor() {
-//        reviewList = new ReviewList();
-//        qaList = new QAList();
-    }
-
     /**
      * Read and parse the JSON file into review object and
      * insert each term, and it's document index reference to Inverted Index
@@ -39,8 +34,8 @@ public class DataProcessor {
     public boolean readReviews(String fileLocation) {
         boolean flag = false;
 
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(fileLocation), StandardCharsets.ISO_8859_1)){
-            int index = 0;
+        try (BufferedReader br = Files.newBufferedReader(Paths.get(fileLocation), StandardCharsets.ISO_8859_1)) {
+            int index = reviewList.getSize();
             String line = br.readLine();
 
             while (line != null) {
@@ -50,6 +45,7 @@ public class DataProcessor {
                     reviewList.add(index, review);
                     process(review.getReviewText(), index, SearchConstants.Type.REVIEW);
                     index++;
+                    flag = true;
                 }
 
                 line = br.readLine();
@@ -60,9 +56,8 @@ public class DataProcessor {
             io.printStackTrace(new PrintWriter(writer));
 
             System.out.printf("An error occurred while accessing file at a location %s. %s", fileLocation, writer);
+            flag = false;
         }
-
-        flag = reviewList.getCount() > 0;
 
         return flag;
     }
@@ -77,7 +72,7 @@ public class DataProcessor {
         boolean flag = false;
 
         try (BufferedReader br = Files.newBufferedReader(Paths.get(fileLocation), StandardCharsets.ISO_8859_1)){
-            int index = 0;
+            int index = qaList.getSize();
             String line = br.readLine();
 
             while (line != null) {
@@ -87,6 +82,7 @@ public class DataProcessor {
                     qaList.add(index, qa);
                     process(String.format("%s %s", qa.getQuestion(), qa.getAnswer()), index, SearchConstants.Type.QA);
                     index++;
+                    flag = true;
                 }
 
                 line = br.readLine();
@@ -97,9 +93,8 @@ public class DataProcessor {
             io.printStackTrace(new PrintWriter(writer));
 
             System.out.printf("An error occurred while accessing file at a location %s. %s", fileLocation, writer);
+            flag = false;
         }
-
-        flag = qaList.getCount() > 0;
 
         return flag;
     }
@@ -111,22 +106,26 @@ public class DataProcessor {
      */
     public String findAsin(String asin) {
         StringBuilder stringBuilder = new StringBuilder();
-        String output = reviewList.toString(asin);
 
-        if(Strings.isNullOrEmpty(output)) {
-            stringBuilder.append(String.format("<h3>No reviews found for the product with asin number: %s.</h3><br /> \n", asin));
-        }
-        else {
-            stringBuilder.append(output);
-        }
+        if(!Strings.isNullOrEmpty(asin)) {
+            String output = reviewList.toString(asin);
 
-        output = qaList.toString(asin);
+            if (Strings.isNullOrEmpty(output)) {
+                stringBuilder.append(String.format("<h3>No reviews found for the product with asin number: %s.</h3><br /> \n", asin));
+            } else {
+                stringBuilder.append(output);
+            }
 
-        if(Strings.isNullOrEmpty(output)) {
-            stringBuilder.append(String.format("<h3>No questions and answers found for the product with asin number: %s.</h3><br /> \n", asin));
+            output = qaList.toString(asin);
+
+            if (Strings.isNullOrEmpty(output)) {
+                stringBuilder.append(String.format("<h3>No questions and answers found for the product with asin number: %s.</h3><br /> \n", asin));
+            } else {
+                stringBuilder.append(output);
+            }
         }
-        else {
-            stringBuilder.append(output);
+        else  {
+            stringBuilder.append("<h3 style=\"color: red;\">No Input was given. Provide \"ASIN\" number. </h3>\n");
         }
 
         return stringBuilder.toString();
@@ -139,24 +138,28 @@ public class DataProcessor {
      * @param term One word term
      */
     public String reviewSearch(String term) {
-        InvertedIndex reviewIndex = Factory.getIndex(SearchConstants.Type.REVIEW);
-        List<Integer> documentList = reviewIndex.get(term);
         StringBuilder stringBuilder = new StringBuilder();
 
-        if(documentList != null && documentList.size() > 0) {
-            int numbering = 1;
+        if(!Strings.isNullOrEmpty(term)) {
+            InvertedIndex reviewIndex = Factory.getIndex(SearchConstants.Type.REVIEW);
+            List<Integer> documentList = reviewIndex.get(term);
 
-            for (Integer documentIndex : documentList) {
-                String output = reviewList.toString(documentIndex);
+            if (documentList != null && documentList.size() > 0) {
+                int numbering = 1;
 
-                if(!Strings.isNullOrEmpty(output)) {
-                    stringBuilder.append(String.format("<p>%d) %s.</p>\n", numbering, output));
-                    numbering++;
+                for (Integer documentIndex : documentList) {
+                    String output = reviewList.toString(documentIndex);
+
+                    if (!Strings.isNullOrEmpty(output)) {
+                        stringBuilder.append(String.format("<p>%d) %s.</p>\n", numbering, output));
+                        numbering++;
+                    }
                 }
+            } else {
+                stringBuilder.append(String.format("<h3 style=\"color: red;\">No term i.e. \"%s\" found. </h3> \n", term));
             }
-        }
-        else {
-            stringBuilder.append(String.format("No term i.e. \"%s\" found. \n", term));
+        }else  {
+            stringBuilder.append("<h3 style=\"color: red;\">No Input was given. Provide \"TERM\" number. </h3>\n");
         }
 
         return stringBuilder.toString();
@@ -169,19 +172,21 @@ public class DataProcessor {
      * @param type Indicated whether text is from review object or from QA object.
      */
     private void process(String text, int index, SearchConstants.Type type) {
-        InvertedIndex invertedIndex = Factory.getIndex(type);
-        //Making all characters in a string as lowercase.
-        text = text.toLowerCase();
+        if(!Strings.isNullOrEmpty(text)) {
+            InvertedIndex invertedIndex = Factory.getIndex(type);
+            //Making all characters in a string as lowercase.
+            text = text.toLowerCase();
 
-        //Splitting text by space
-        String[] words = text.split(" ");
+            //Splitting text by space
+            String[] words = text.split(" ");
 
-        for (int i = 0; i < words.length; i++) {
-            //Replacing all non-alphabetic digits with empty character.
-            String word = words[i].replaceAll("[^a-z0-9]", "");
+            for (int i = 0; i < words.length; i++) {
+                //Replacing all non-alphabetic digits with empty character.
+                String word = words[i].replaceAll("[^a-z0-9]", "");
 
-            if(!Strings.isNullOrEmpty(word)) {
-                invertedIndex.upsert(word, index);
+                if (!Strings.isNullOrEmpty(word)) {
+                    invertedIndex.upsert(word, index);
+                }
             }
         }
     }

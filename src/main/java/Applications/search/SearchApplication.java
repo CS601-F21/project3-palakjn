@@ -96,7 +96,10 @@ public class SearchApplication {
      */
     private void readConfig(String configFileLocation) {
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(configFileLocation))) {
-            configuration = JsonManager.fromJson(reader, Config.class).getSearch();
+            Config config = JsonManager.fromJson(reader, Config.class);
+            if(config != null) {
+                configuration = config.getSearch();
+            }
         }
         catch (IOException ioException) {
             StringWriter writer = new StringWriter();

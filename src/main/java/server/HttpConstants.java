@@ -32,6 +32,6 @@ public class HttpConstants {
         STATUS_CODE.put(400, "400 Bad Request");
         STATUS_CODE.put(411, "411 Length Required");
         STATUS_CODE.put(505, "505 HTTP Version Not Supported");
-        STATUS_CODE.put(204, "No Content");
+        STATUS_CODE.put(204, "204 No Content");
     }
 }

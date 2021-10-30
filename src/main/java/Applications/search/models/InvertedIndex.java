@@ -56,4 +56,17 @@ public class InvertedIndex {
             this.lock.readLock().unlock();
         }
     }
+
+    /**
+     * Removes all the elements from the map
+     */
+    public void RemoveAll() {
+        this.lock.writeLock().lock();
+
+        try {
+            wordMap.clear();
+        } finally {
+            this.lock.writeLock().unlock();
+        }
+    }
 }

@@ -70,12 +70,12 @@ public class ReviewList {
         return output;
     }
 
+
     /**
-     * Returns the number of elements in a list
-     *
-     * @return The number of elements in a list.
+     * Returns the length of Review List
+     * @return
      */
-    public int getCount() {
+    public int getSize() {
         return allReviews.size();
     }
 }

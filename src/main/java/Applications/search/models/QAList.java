@@ -1,5 +1,7 @@
 package applications.search.models;
 
+import utils.Strings;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,16 +37,19 @@ public class QAList {
      */
     public String toString(String asin) {
         StringBuilder stringBuilder = new StringBuilder();
-        //Getting those questions and answers whose asin number is equal to arg "asin" value.
-        List<QA> queries = allQAs.stream().filter(o -> o.getAsin().equalsIgnoreCase(asin)).toList();
-        int bulletNumbers = 1;
 
-        if(queries.size() > 0) {
-            stringBuilder.append(String.format("<h3>Asin number: %s. Questions & Answers: </h3><br />\n", asin));
+        if(!Strings.isNullOrEmpty(asin)) {
+            //Getting those questions and answers whose asin number is equal to arg "asin" value.
+            List<QA> queries = allQAs.stream().filter(o -> o.getAsin().equalsIgnoreCase(asin)).toList();
+            int bulletNumbers = 1;
 
-            for (QA query : queries) {
-                stringBuilder.append(String.format("<p>%d) %s</p>\n", bulletNumbers, query.toString()));
-                bulletNumbers++;
+            if (queries.size() > 0) {
+                stringBuilder.append(String.format("<h3>Asin number: %s. Questions & Answers: </h3><br />\n", asin));
+
+                for (QA query : queries) {
+                    stringBuilder.append(String.format("<p>%d) %s</p>\n", bulletNumbers, query.toString()));
+                    bulletNumbers++;
+                }
             }
         }
 
@@ -69,11 +74,10 @@ public class QAList {
     }
 
     /**
-     * Returns the number of elements in a list
-     *
-     * @return The number of elements in a list.
+     * Returns the length of QA List
+     * @return
      */
-    public int getCount() {
+    public int getSize() {
         return allQAs.size();
     }
 }

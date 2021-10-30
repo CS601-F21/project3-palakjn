@@ -2,6 +2,7 @@ package server.models;
 
 import server.HttpConstants;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class WebRequest {
@@ -10,6 +11,10 @@ public class WebRequest {
     private String path;
     private String version;
     private Map<String, String> headers;
+
+    public WebRequest() {
+        this.headers = new HashMap<>();
+    }
 
     public String getMethod() {
         return method;
@@ -35,10 +40,6 @@ public class WebRequest {
         this.version = version;
     }
 
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
-    }
-
     public boolean isGET() {
         return method.equals(HttpConstants.GET);
     }
@@ -49,5 +50,13 @@ public class WebRequest {
 
     public String getHeader(String key) {
         return headers.getOrDefault(key, null);
+    }
+
+    public void addHeader(String key, String value) {
+        this.headers.put(key, value);
+    }
+
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
     }
 }
