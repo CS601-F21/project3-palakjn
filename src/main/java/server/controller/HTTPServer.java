@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public class HTTPServer {
 
-    private HashMap<String, Handler> handlers;
+    private Map<String, Handler> handlers;
     private volatile boolean running = true;
     private int port;
     private ExecutorService threadPool;

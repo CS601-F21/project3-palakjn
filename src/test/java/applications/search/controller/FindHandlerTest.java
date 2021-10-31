@@ -32,18 +32,19 @@ public class FindHandlerTest {
         PrintWriter expectedPrintWriter = new PrintWriter(expectedStringWriter);
         expectedPrintWriter.printf("HTTP/1.1 200 OK\r\n");
         expectedPrintWriter.printf("Connection: close \r\n\r\n");
-        expectedPrintWriter.println("<!DOCTYPE html>\n" +
-                "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-                "<head>\n" +
-                "  <title>Find</title>\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "<form class=\"form\" action=\"/find\" method=\"post\">\n" +
-                "<input type=\"text\" name=\"asin\" placeholder=\"ASIN Number\"></input><br />\n" +
-                "<button  type\"submit\">Search</button>\n" +
-                "</form>\n" +
-                "</body>\n" +
-                "</html>");
+        expectedPrintWriter.println("""
+                <!DOCTYPE html>
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                <head>
+                  <title>Find</title>
+                </head>
+                <body>
+                <form class="form" action="/find" method="post">
+                <input type="text" name="asin" placeholder="ASIN Number"></input><br />
+                <button  type"submit">Search</button>
+                </form>
+                </body>
+                </html>""");
 
         Assertions.assertEquals(expectedStringWriter.toString(), actualStringWriter.toString());
     }
@@ -83,22 +84,24 @@ public class FindHandlerTest {
             PrintWriter expectedPrintWriter = new PrintWriter(expectedStringWriter);
             expectedPrintWriter.printf("HTTP/1.1 200 OK\r\n");
             expectedPrintWriter.printf("Connection: close \r\n\r\n");
-            expectedPrintWriter.println("<!DOCTYPE html>\n" +
-                    "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-                    "<head>\n" +
-                    "  <title>Find</title>\n" +
-                    "</head>\n" +
-                    "<body>\n" +
-                    "<form class=\"form\" action=\"/find\" method=\"post\">\n" +
-                    "<input type=\"text\" name=\"asin\" placeholder=\"ASIN Number\"></input><br />\n" +
-                    "<button  type\"submit\">Search</button>\n" +
-                    "</form><br /><br /><br />\n" +
-                    "<h3>Asin number: 12345. Reviews: </h3><br />\n" +
-                    "<p>1) ReviewerID: null, ReviewerName: null, ReviewerText: The dog and the cat</p>\n" +
-                    "<h3>Asin number: 12345. Questions & Answers: </h3><br />\n" +
-                    "<p>1) Question: How are you, Answer: I am fine</p>\n \n" +
-                    "</body>\n" +
-                    "</html>");
+            expectedPrintWriter.println("""
+                    <!DOCTYPE html>
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                    <head>
+                      <title>Find</title>
+                    </head>
+                    <body>
+                    <form class="form" action="/find" method="post">
+                    <input type="text" name="asin" placeholder="ASIN Number"></input><br />
+                    <button  type"submit">Search</button>
+                    </form><br /><br /><br />
+                    <h3>Asin number: 12345. Reviews: </h3><br />
+                    <p>1) ReviewerID: null, ReviewerName: null, ReviewerText: The dog and the cat</p>
+                    <h3>Asin number: 12345. Questions & Answers: </h3><br />
+                    <p>1) Question: How are you, Answer: I am fine</p>
+                    \s
+                    </body>
+                    </html>""");
 
             Assertions.assertEquals(expectedStringWriter.toString(), actualStringWriter.toString());
         } catch (IOException ioException) {
