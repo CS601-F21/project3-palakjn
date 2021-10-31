@@ -32,9 +32,6 @@ public class SlackApplication {
             boolean isValid = slackApplication.verifyConfig();
 
             if(isValid) {
-                SlackConstants.setCHANNEL(slackApplication.configuration.getChannel());
-                SlackConstants.setAccessToken(slackApplication.configuration.getAccessToken());
-
                 //Starting server
                 slackApplication.startServer();
             }
@@ -42,6 +39,9 @@ public class SlackApplication {
     }
 
     private void startServer() {
+        SlackConstants.setCHANNEL(this.configuration.getChannel());
+        SlackConstants.setAccessToken(this.configuration.getAccessToken());
+
         HTTPServer server = new HTTPServer(SlackConstants.PORT);
         server.addMapping(SlackConstants.SLACK_BOT_URI, new SlackHandler());
         server.startup();

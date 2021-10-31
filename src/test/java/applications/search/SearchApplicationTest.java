@@ -1,16 +1,12 @@
 package applications.search;
 
 import applications.search.configuration.SearchConfig;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.Socket;
 
 public class SearchApplicationTest {
     private SearchApplication searchApplication = new SearchApplication();

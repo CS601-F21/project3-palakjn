@@ -1,18 +1,14 @@
 package applications.search;
 
+import applications.ServerUtil;
 import applications.search.configuration.SearchConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.Socket;
 
 public class SearchSystemTest {
     private static SearchApplication searchApplication = new SearchApplication();
@@ -33,7 +29,7 @@ public class SearchSystemTest {
     @Test
     public void GET_findPath_returnExpectedPage() {
         //Main thread will make a Get request to a server
-        String actual = doGet("localhost", "/find");
+        String actual = ServerUtil.doGet(8080,"localhost", "/find");
 
         String expected = "HTTP/1.1 200 OK\n" +
                 "Connection: close \n" +
@@ -57,7 +53,7 @@ public class SearchSystemTest {
     @Test
     public void GET_reviewPath_returnExpectedPage() {
         //Main thread will make a Get request to a server
-        String actual = doGet("localhost", "/reviewsearch");
+        String actual = ServerUtil.doGet(8080,"localhost", "/reviewsearch");
 
         String expected = "HTTP/1.1 200 OK\n" +
                 "Connection: close \n" +
@@ -81,7 +77,7 @@ public class SearchSystemTest {
     @Test
     public void GET_wrongPath_return405NotFound() {
         //Main thread will make a Get request to a server
-        String actual = doGet("localhost", "/qasearch");
+        String actual = ServerUtil.doGet(8080, "localhost", "/qasearch");
 
         String expected = "HTTP/1.1 404 Not Found\n" +
                 "Connection: close \n" +
@@ -103,9 +99,9 @@ public class SearchSystemTest {
 
     @Test
     public void POST_findPath_validASIN_returnResponse() {
-        String body = getBody("asin","120401325X");
+        String body = ServerUtil.getBody("asin","120401325X");
 
-        String actual = doPost("localhost", "/find", body);
+        String actual = ServerUtil.doPost(8080,"localhost", "/find", body);
 
         String expected = "HTTP/1.1 200 OK\n" +
                 "Connection: close \n" +
@@ -134,9 +130,9 @@ public class SearchSystemTest {
 
     @Test
     public void POST_reviewPath_validTerm_returnResponse() {
-        String body = getBody("term","great");
+        String body = ServerUtil.getBody("term","great");
 
-        String actual = doPost("localhost", "/reviewsearch", body);
+        String actual = ServerUtil.doPost(8080,"localhost", "/reviewsearch", body);
 
         String expected = "HTTP/1.1 200 OK\n" +
                 "Connection: close \n" +
@@ -164,9 +160,9 @@ public class SearchSystemTest {
 
     @Test
     public void POST_reviewPath_specialCharTerm_returnResponse() {
-        String body = getBody("term","fr!ee");
+        String body = ServerUtil.getBody("term","fr!ee");
 
-        String actual = doPost("localhost", "/reviewsearch", body);
+        String actual = ServerUtil.doPost(8080,"localhost", "/reviewsearch", body);
 
         String expected = "HTTP/1.1 200 OK\n" +
                 "Connection: close \n" +
@@ -221,112 +217,6 @@ public class SearchSystemTest {
             Assertions.assertTrue(isValid);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException exception) {
             System.err.println(exception.getMessage());
-        }
-    }
-
-    private static void stopServer() {
-        try {
-            Method processMethod = SearchApplication.class.getDeclaredMethod("shutdown");
-            processMethod.setAccessible(true);
-            boolean isValid = (boolean) processMethod.invoke(searchApplication);
-
-            Assertions.assertTrue(isValid);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException exception) {
-            System.err.println(exception.getMessage());
-        }
-    }
-
-    private String doGet(String host, String path) {
-        StringBuilder builder = new StringBuilder();
-        Socket socket = null;
-
-        //Waiting for server to be up
-        do {
-            try {
-                socket = new Socket("localhost", 8080);
-            }
-            catch (IOException ioException) {
-                sleep(1000);
-            }
-        } while (socket == null);
-
-        try (
-                PrintWriter writer = new PrintWriter(socket.getOutputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))
-        ){
-            String request = getGETRequest(host, path);
-            writer.println(request);
-            writer.flush();
-
-            String line = reader.readLine();
-            while (line != null) {
-                builder.append(line).append("\n");
-                line = reader.readLine();
-            }
-        } catch (IOException ioException) {
-            System.err.println(ioException.getMessage());
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException ioException) {
-                System.err.println("Exception while closing the socket " + ioException.getMessage());
-            }
-        }
-
-        return builder.toString();
-    }
-
-    private String doPost(String host, String path, String body) {
-        StringBuilder builder = new StringBuilder();
-
-        try (
-                Socket socket = new Socket("localhost", 8080);
-                PrintWriter writer = new PrintWriter(socket.getOutputStream());
-                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))
-        ){
-            String request = getPOSTRequest(host, path, body.length());
-            writer.println(request);
-            writer.println(body);
-            writer.flush();
-
-            String line = reader.readLine();
-            while (line != null) {
-                builder.append(line + "\n");
-                line = reader.readLine();
-            }
-        } catch (IOException ioException) {
-            System.err.println(ioException.getMessage());
-        }
-
-        return builder.toString();
-    }
-
-    private String getGETRequest(String host, String path) {
-        String request = "GET " + path + " HTTP/1.1" + "\n" //GET request
-                + "Host: " + host + "\n" //Host header required for HTTP/1.1
-                + "Connection: close\n" //Closing connection
-                + "\r\n";
-        return request;
-    }
-
-    private String getPOSTRequest(String host, String path, int contentLength) {
-        String request = "POST " + path + " HTTP/1.1" + "\n" //Post request
-                + "Host: " + host + "\n" //Host header required for HTTP/1.1
-                + "Content-Length: " + contentLength + "\n" //Content Length
-                + "Connection: close\n"; //Closing connection
-        return request;
-    }
-
-    private String getBody(String key, String value) {
-        return String.format("%s=%s", key, value);
-    }
-
-    private void sleep(long milliseconds) {
-        try {
-            Thread.sleep(milliseconds);
-        }
-        catch (InterruptedException exception) {
-            System.out.printf("Fail to sleep for %d time. %s.\n", milliseconds, exception);
         }
     }
 }
