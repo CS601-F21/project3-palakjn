@@ -71,10 +71,6 @@ public class SearchApplication {
         this.httpServer.startup();
     }
 
-    private void shutdown() {
-        this.httpServer.shutdown();
-    }
-
     /**
      * Read comment line arguments and return the location of the configuration file.
      * @param args Command line arguments being passed when running a program

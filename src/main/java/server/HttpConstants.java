@@ -11,17 +11,63 @@ public class HttpConstants {
     public static final String CONTENT_LENGTH = "Content-Length:";
     public static final String CONNECTION_CLOSE = "Connection: close";
 
-    public static final String NOT_FOUND_PAGE = "<!DOCTYPE html>\n" +
-            "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-            "<head>\n" +
-            "  <title>Resource not found</title>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "\n" +
-            "  <p>The resource you are looking for was not found.</p>\n" +
-            "\n" +
-            "</body>\n" +
-            "</html>";
+    public static final String SHUTDOWN_PATH = "/shutdown";
+
+    public static final String PASSCODE = "palakjn";
+
+    public static final String NOT_FOUND_PAGE = """
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+              <title>Resource not found</title>
+            </head>
+            <body>
+
+              <p>The resource you are looking for was not found.</p>
+
+            </body>
+            </html>""";
+
+    public static final String SHUTDOWN_PAGE = """
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+              <title>Review Search</title>
+            </head>
+            <body>
+            <form action="/shutdown" method="post">
+            <input type="password" name="passcode" placeholder="Passcode"></input><br />
+            <button  type"submit">Shutdown</button>
+            </form>
+            </body>
+            </html>""";
+
+    public static final String SHUTDOWN_RESPONSE = """
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+              <title>Review Search</title>
+            </head>
+            <body>
+            <h3 style="color: green;">%s</h3>
+            </form>
+            </body>
+            </html>""";
+
+    public static final String SHUTDOWN_ERROR_PAGE = """
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+              <title>Review Search</title>
+            </head>
+            <body>
+            <form action="/shutdown" method="post">
+            <input type="password" name="passcode" placeholder="Passcode"></input><br />
+            <button  type"submit">Shutdown</button>
+            </form>
+            <h3 style="color: red;">%s</h3>
+            </body>
+            </html>""";
 
     public static Map<Integer, String> STATUS_CODE = new HashMap<>();
 

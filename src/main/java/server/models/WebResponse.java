@@ -40,4 +40,8 @@ public class WebResponse {
     public void send(String response) {
         writer.println(response);
     }
+
+    public void flush() {
+        writer.flush();
+    }
 }

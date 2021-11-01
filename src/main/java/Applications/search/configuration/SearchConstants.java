@@ -15,57 +15,61 @@ public class SearchConstants {
     }
 
     //XHTML pages
-    public static final String REVIEW_SEARCH_FORM = "<!DOCTYPE html>\n" +
-            "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-            "<head>\n" +
-            "  <title>Review Search</title>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "<form class=\"form\" action=\"/reviewsearch\" method=\"post\">\n" +
-            "<input type=\"text\" name=\"term\" placeholder=\"Term\"></input><br />\n" +
-            "<button  type\"submit\">Search</button>\n" +
-            "</form>\n" +
-            "</body>\n" +
-            "</html>";
+    public static final String REVIEW_SEARCH_FORM = """
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+              <title>Review Search</title>
+            </head>
+            <body>
+            <form class="form" action="/reviewsearch" method="post">
+            <input type="text" name="term" placeholder="Term"></input><br />
+            <button  type"submit">Search</button>
+            </form>
+            </body>
+            </html>""";
 
-    public static final String FIND_FORM = "<!DOCTYPE html>\n" +
-            "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-            "<head>\n" +
-            "  <title>Find</title>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "<form class=\"form\" action=\"/find\" method=\"post\">\n" +
-            "<input type=\"text\" name=\"asin\" placeholder=\"ASIN Number\"></input><br />\n" +
-            "<button  type\"submit\">Search</button>\n" +
-            "</form>\n" +
-            "</body>\n" +
-            "</html>";
+    public static final String FIND_FORM = """
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+              <title>Find</title>
+            </head>
+            <body>
+            <form action="/find" method="post">
+            <input type="text" name="asin" placeholder="ASIN Number"></input><br />
+            <button  type"submit">Search</button>
+            </form>
+            </body>
+            </html>""";
 
-    public static final String REVIEW_SEARCH_RESPONSE = "<!DOCTYPE html>\n" +
-            "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-            "<head>\n" +
-            "  <title>Review Search</title>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "<form class=\"form\" action=\"/reviewsearch\" method=\"post\">\n" +
-            "<input type=\"text\" name=\"term\" placeholder=\"Term\"></input><br />\n" +
-            "<button  type\"submit\">Search</button>\n" +
-            "</form><br /><br /><br />\n" +
-            "%s \n" +
-            "</body>\n" +
-            "</html>";
+    public static final String REVIEW_SEARCH_RESPONSE = """
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+              <title>Review Search</title>
+            </head>
+            <body>
+            <form class="form" action="/reviewsearch" method="post">
+            <input type="text" name="term" placeholder="Term"></input><br />
+            <button  type"submit">Search</button>
+            </form><br /><br /><br />
+            %s\s
+            </body>
+            </html>""";
 
-    public static final String FIND_ASIN_RESPONSE = "<!DOCTYPE html>\n" +
-            "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-            "<head>\n" +
-            "  <title>Find</title>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "<form class=\"form\" action=\"/find\" method=\"post\">\n" +
-            "<input type=\"text\" name=\"asin\" placeholder=\"ASIN Number\"></input><br />\n" +
-            "<button  type\"submit\">Search</button>\n" +
-            "</form><br /><br /><br />\n" +
-            "%s \n" +
-            "</body>\n" +
-            "</html>";
+    public static final String FIND_ASIN_RESPONSE = """
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+              <title>Find</title>
+            </head>
+            <body>
+            <form class="form" action="/find" method="post">
+            <input type="text" name="asin" placeholder="ASIN Number"></input><br />
+            <button  type"submit">Search</button>
+            </form><br /><br /><br />
+            %s\s
+            </body>
+            </html>""";
 }

@@ -1,5 +1,6 @@
 package server.controller;
 
+import applications.slack.configuration.SlackConstants;
 import server.HttpConstants;
 import server.models.WebRequest;
 import server.models.WebResponse;
@@ -66,31 +67,6 @@ public class HTTPServer {
         }
     }
 
-    public void shutdown() {
-        running = false;
-
-        threadPool.shutdown();
-
-        try {
-            if(!threadPool.awaitTermination(2, TimeUnit.MINUTES)) {
-                threadPool.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            System.err.println("Error while terminating threadpool: " + e.getMessage());
-        }
-
-        try {
-            //After closing the socket, thread will wake up from the socket.accept() call and then will exit the loop
-            this.serverSocket.close();
-            if(this.socket != null) {
-                //When there is no remote host, then socket will be null.
-                this.socket.close();
-            }
-        } catch (IOException ioException) {
-            System.out.printf("Error while closing the remote connection. %s.\n", ioException);
-        }
-    }
-
     private void handleRequest(Socket socket) {
         try (socket;
              BufferedReader inStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -104,25 +80,95 @@ public class HTTPServer {
             boolean isValidRequest = validateRequest(requestLine, webResponse);
 
             if(isValidRequest) {
-                WebRequest httpRequest = new WebRequest();
+                WebRequest webRequest = new WebRequest();
 
                 //Reading method, path, version
                 String[] requestLineParts = requestLine.split("\\s");
-                httpRequest.setMethod(requestLineParts[0]);
-                httpRequest.setPath(requestLineParts[1]);
-                httpRequest.setVersion(requestLineParts[2]);
+                webRequest.setMethod(requestLineParts[0]);
+                webRequest.setPath(requestLineParts[1]);
+                webRequest.setVersion(requestLineParts[2]);
 
-                System.out.println("HTTP method: "+ httpRequest.getMethod());
-                System.out.println("Path: " + httpRequest.getPath());
-                System.out.println("Version: " + httpRequest.getVersion());
+                System.out.println("HTTP method: "+ webRequest.getMethod());
+                System.out.println("Path: " + webRequest.getPath());
+                System.out.println("Version: " + webRequest.getVersion());
 
                 //Read headers
-                httpRequest.setHeaders(getHeader(inStream));
+                webRequest.setHeaders(getHeader(inStream));
 
-                handlers.get(httpRequest.getPath()).handle(httpRequest, webResponse);
+                if(webRequest.getPath().equals(HttpConstants.SHUTDOWN_PATH)) {
+                    shutdown(webRequest, webResponse);
+                } else {
+                    handlers.get(webRequest.getPath()).handle(webRequest, webResponse);
+                }
             }
         } catch(IOException ioe) {
             ioe.printStackTrace();
+        }
+    }
+
+    private void shutdown(WebRequest request, WebResponse response) throws IOException {
+        if(request.isGET()) {
+            response.setStatus(200);
+            response.send(HttpConstants.SHUTDOWN_PAGE);
+        }
+
+        if(request.isPOST()) {
+            int contentLength;
+            String header = request.getHeader(HttpConstants.CONTENT_LENGTH);
+
+            if(!Strings.isNullOrEmpty(header)) {
+                contentLength = Integer.parseInt(header);
+
+                String passcode = response.read(contentLength);
+                if(passcode.equals(HttpConstants.PASSCODE)) {
+                    response.setStatus(200);
+                    response.send(String.format(HttpConstants.SHUTDOWN_RESPONSE, "Shutting down the server..."));
+                    response.flush();
+
+                    shutdown();
+                }
+                else {
+                    //No content to display
+                    response.setStatus(204);
+                    response.send(String.format(HttpConstants.SHUTDOWN_ERROR_PAGE, "Wrong passcode. Try Again..!"));
+                    response.flush();
+                }
+            }
+            else {
+                response.setStatus(411);
+            }
+
+        }
+    }
+
+    private void shutdown() {
+        System.out.println("Shutting down server");
+
+        running = false;
+
+        threadPool.shutdown();
+
+        try {
+            if (!threadPool.awaitTermination(15, TimeUnit.SECONDS)) {
+                threadPool.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            System.err.println("Error while terminating threadpool: " + e.getMessage());
+        }
+
+        System.out.println("Threadpool done. Closing socket");
+
+        try {
+            //After closing the socket, thread will wake up from the socket.accept() call and then will exit the loop
+            this.serverSocket.close();
+            if (this.socket != null) {
+                //When there is no remote host, then socket will be null.
+                this.socket.close();
+            }
+
+            System.out.println("Server is down successfully");
+        } catch (IOException ioException) {
+            System.out.printf("Error while closing the remote connection. %s.\n", ioException);
         }
     }
 
@@ -146,7 +192,7 @@ public class HTTPServer {
                 System.out.println("Method not supported");
                 response.setStatus(405);
             }
-            else if(!handlers.containsKey(requestLineParts[1])) {
+            else if(!handlers.containsKey(requestLineParts[1]) && !requestLineParts[1].equals(HttpConstants.SHUTDOWN_PATH)) {
                 //Page not found
                 System.out.println("Page not found");
                 response.setStatus(404);
