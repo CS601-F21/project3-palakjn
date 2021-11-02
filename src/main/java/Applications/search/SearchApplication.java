@@ -2,14 +2,15 @@ package applications.search;
 
 import applications.search.configuration.SearchConstants;
 import applications.search.configuration.SearchConfig;
-import applications.search.controller.DataProcessor;
-import applications.search.controller.FindHandler;
-import applications.search.controller.ReviewSearchHandler;
+import applications.search.controller.*;
+import applications.slack.configuration.SlackConstants;
 import configuration.Config;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 import server.controller.HTTPServer;
 import utils.JsonManager;
 import utils.Strings;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,14 +18,18 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ * An application which starts a server and allow client to search reviews and Q/A based on term and ASIN number.
+ *
+ * @author Palak Jain
+ */
 public class SearchApplication {
     private SearchConfig configuration;
     private DataProcessor dataProcessor;
-    private HTTPServer httpServer;
+    private static final Logger logger = (Logger) LogManager.getLogger(SearchApplication.class);
 
     public SearchApplication() {
         this.dataProcessor = new DataProcessor();
-        this.httpServer = new HTTPServer(SearchConstants.PORT);
     }
 
     public static void main(String[] args) {
@@ -51,24 +56,34 @@ public class SearchApplication {
         }
     }
 
+    /**
+     * Reading reviews and Q/As from file storage
+     *
+     * @return true if reading is successful else false.
+     */
     private boolean readDataset() {
         //Reading review file
-        System.out.printf("Parsing review file %s...\n", configuration.getReviewDatasetPath());
+        logger.printf(Level.INFO,"Parsing review file %s...", configuration.getReviewDatasetPath());
         boolean isSuccess = dataProcessor.readReviews(configuration.getReviewDatasetPath());
 
         if(isSuccess) {
             //Reading qa file
-            System.out.printf("Parsing QA file %s...\n", configuration.getQaDatasetPath());
+            logger.printf(Level.INFO,"Parsing QA file %s...", configuration.getQaDatasetPath());
             isSuccess = dataProcessor.readQA(configuration.getQaDatasetPath());
         }
 
         return isSuccess;
     }
 
+    /**
+     * Starts the server listening on port 8080
+     */
     private void startServer() {
-        this.httpServer.addMapping(SearchConstants.REVIEW_SEARCH_URI, new ReviewSearchHandler());
-        this.httpServer.addMapping(SearchConstants.FIND_URI, new FindHandler());
-        this.httpServer.startup();
+        logger.printf(Level.INFO, "Starting the server");
+        HTTPServer httpServer = new HTTPServer(SearchConstants.PORT);
+        httpServer.addMapping(SearchConstants.REVIEW_SEARCH_URI, new ReviewSearchHandler());
+        httpServer.addMapping(SearchConstants.FIND_URI, new FindHandler());
+        httpServer.startup();
     }
 
     /**
@@ -85,7 +100,7 @@ public class SearchApplication {
             configFileLocation = args[1];
         }
         else {
-            System.out.println("Invalid Arguments");
+            logger.printf(Level.ERROR,"Invalid Arguments.");
         }
 
         return configFileLocation;
@@ -106,7 +121,7 @@ public class SearchApplication {
             StringWriter writer = new StringWriter();
             ioException.printStackTrace(new PrintWriter(writer));
 
-            System.out.printf("Unable to open configuration file at location %s. %s. \n", configFileLocation, writer);
+            logger.printf(Level.ERROR,"Unable to open configuration file at location %s. %s.", configFileLocation, writer);
         }
     }
 
@@ -118,19 +133,19 @@ public class SearchApplication {
         boolean flag = false;
 
         if(configuration == null) {
-            System.out.println("No configuration found.");
+            logger.printf(Level.ERROR,"No configuration found.");
         }
         else if(Strings.isNullOrEmpty(configuration.getReviewDatasetPath())) {
-            System.out.println("No file location provided for reviews dataset.");
+            logger.printf(Level.ERROR,"No file location provided for reviews dataset.");
         }
         else if(Strings.isNullOrEmpty(configuration.getQaDatasetPath())) {
-            System.out.println("No file location provided for QA dataset.");
+            logger.printf(Level.ERROR,"No file location provided for QA dataset.");
         }
         else if(!Files.exists(Paths.get(configuration.getReviewDatasetPath()))) {
-            System.out.printf("No file found at a location %s.\n", configuration.getReviewDatasetPath());
+            logger.printf(Level.ERROR,"No file found at a location %s.\n", configuration.getReviewDatasetPath());
         }
         else if(!Files.exists(Paths.get(configuration.getQaDatasetPath()))) {
-            System.out.printf("No file found at a location %s.\n", configuration.getQaDatasetPath());
+            logger.printf(Level.ERROR,"No file found at a location %s.\n", configuration.getQaDatasetPath());
         }
         else {
             flag = true;

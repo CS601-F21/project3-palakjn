@@ -1,13 +1,18 @@
 package applications.search.configuration;
 
+/**
+ * Constant values required by Search Server.
+ *
+ * @author Palak Jain
+ */
 public class SearchConstants {
 
     //Port
-    public static int PORT = 8080;
+    public static final int PORT = 8080;
 
     //Path
-    public static String REVIEW_SEARCH_URI = "/reviewsearch";
-    public static String FIND_URI = "/find";
+    public static final String REVIEW_SEARCH_URI = "/reviewsearch";
+    public static final String FIND_URI = "/find";
 
     public enum Type {
         REVIEW,
@@ -36,7 +41,7 @@ public class SearchConstants {
               <title>Find</title>
             </head>
             <body>
-            <form action="/find" method="post">
+            <form class="form" action="/find" method="post">
             <input type="text" name="asin" placeholder="ASIN Number"></input><br />
             <button  type"submit">Search</button>
             </form>

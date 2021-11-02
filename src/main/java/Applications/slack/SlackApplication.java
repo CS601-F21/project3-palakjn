@@ -4,6 +4,9 @@ import applications.slack.configuration.SlackConfig;
 import applications.slack.configuration.SlackConstants;
 import applications.slack.controller.SlackHandler;
 import configuration.Config;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 import server.controller.HTTPServer;
 import utils.JsonManager;
 import utils.Strings;
@@ -15,8 +18,14 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ * An application which starts a server and allow client to send a message to a channel in Slack.
+ *
+ * @author Palak Jain
+ */
 public class SlackApplication {
     private SlackConfig configuration;
+    private static final Logger logger = (Logger) LogManager.getLogger(SlackApplication.class);
 
     public static void main(String[] args) {
         SlackApplication slackApplication = new SlackApplication();
@@ -38,10 +47,15 @@ public class SlackApplication {
         }
     }
 
+    /**
+     * Starts the server listening on port 9090
+     */
     private void startServer() {
+        //Setting the channel and access token
         SlackConstants.setCHANNEL(this.configuration.getChannel());
         SlackConstants.setAccessToken(this.configuration.getAccessToken());
 
+        logger.printf(Level.INFO, "Starting the server");
         HTTPServer server = new HTTPServer(SlackConstants.PORT);
         server.addMapping(SlackConstants.SLACK_BOT_URI, new SlackHandler());
         server.startup();
@@ -61,7 +75,7 @@ public class SlackApplication {
             configFileLocation = args[1];
         }
         else {
-            System.out.println("Invalid Arguments");
+            logger.printf(Level.ERROR,"Invalid Arguments");
         }
 
         return configFileLocation;
@@ -79,7 +93,7 @@ public class SlackApplication {
             StringWriter writer = new StringWriter();
             ioException.printStackTrace(new PrintWriter(writer));
 
-            System.out.printf("Unable to open configuration file at location %s. %s. \n", configFileLocation, writer);
+            logger.printf(Level.ERROR,"Unable to open configuration file at location %s. %s. \n", configFileLocation, writer);
         }
     }
 
@@ -91,13 +105,13 @@ public class SlackApplication {
         boolean flag = false;
 
         if(configuration == null) {
-            System.out.println("No configuration found.");
+            logger.printf(Level.ERROR,"No configuration found.");
         }
         else if(Strings.isNullOrEmpty(configuration.getAccessToken())) {
-            System.out.println("Access token is null");
+            logger.printf(Level.ERROR,"Access token is null");
         }
         else if(Strings.isNullOrEmpty(configuration.getChannel())) {
-            System.out.println("No channel being provided");
+            logger.printf(Level.ERROR,"No channel being provided");
         }
         else {
             flag = true;

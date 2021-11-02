@@ -18,9 +18,9 @@ public class SlackHandlerTest {
 
     @Test
     public void doGet_validInputs_sendValidResponse() {
-        WebRequest webRequest = new WebRequest();
+        WebRequest webRequest = new WebRequest(null);
         StringWriter actualStringWriter = new StringWriter();
-        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter), null);
+        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter));
 
         slackHandler.doGet(webRequest, webResponse);
 
@@ -47,9 +47,9 @@ public class SlackHandlerTest {
 
     @Test
     public void doPost_withNoHeader_send411() {
-        WebRequest webRequest = new WebRequest();
+        WebRequest webRequest = new WebRequest(null);
         StringWriter actualStringWriter = new StringWriter();
-        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter), null);
+        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter));
 
         try {
             slackHandler.doPost(webRequest, webResponse);
@@ -67,10 +67,10 @@ public class SlackHandlerTest {
 
     @Test
     public void doPost_noConfig_send200WithError() {
-        WebRequest webRequest = new WebRequest();
-        StringWriter actualStringWriter = new StringWriter();
         BufferedReader reader = new BufferedReader(new StringReader("12345"));
-        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter), reader);
+        WebRequest webRequest = new WebRequest(reader);
+        StringWriter actualStringWriter = new StringWriter();
+        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter));
         webRequest.addHeader("Content-Length:", "5");
 
         try {

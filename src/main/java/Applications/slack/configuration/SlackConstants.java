@@ -1,5 +1,10 @@
 package applications.slack.configuration;
 
+/**
+ * Constant value required by Slack Server
+ *
+ * @author Palak Jain
+ */
 public class SlackConstants {
 
     //Port

@@ -19,12 +19,12 @@ public class IndexCreator {
      * else will return the existing one.
      * @return Instance of InvertedIndex
      */
-    public static InvertedIndex getReviewIndex() {
+    public synchronized static InvertedIndex getReviewIndex() {
         if(reviewIndex == null) {
             reviewIndex = new InvertedIndex();
         }
 
-        return  reviewIndex;
+        return reviewIndex;
     }
 
     /**
@@ -32,7 +32,7 @@ public class IndexCreator {
      * else will return the existing one.
      * @return Instance of InvertedIndex
      */
-    public static InvertedIndex getQaIndex() {
+    public synchronized static InvertedIndex getQaIndex() {
         if(qaIndex == null) {
             qaIndex = new InvertedIndex();
         }

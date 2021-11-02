@@ -1,7 +1,11 @@
 package applications.search.controller;
 
+import applications.search.SearchApplication;
 import applications.search.configuration.SearchConstants;
 import applications.search.models.*;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 import utils.JsonManager;
 import utils.Strings;
 
@@ -24,6 +28,7 @@ public class DataProcessor {
 
     private static ReviewList reviewList = new ReviewList();
     private static QAList qaList = new QAList();
+    private static final Logger logger = (Logger) LogManager.getLogger(DataProcessor.class);
 
     /**
      * Read and parse the JSON file into review object and
@@ -59,6 +64,7 @@ public class DataProcessor {
             flag = false;
         }
 
+        logger.printf(Level.INFO, "Read %s reviews", reviewList.getSize());
         return flag;
     }
 
@@ -96,6 +102,7 @@ public class DataProcessor {
             flag = false;
         }
 
+        logger.printf(Level.INFO, "Read %s questions and answers", qaList.getSize());
         return flag;
     }
 
@@ -111,6 +118,7 @@ public class DataProcessor {
             String output = reviewList.toString(asin);
 
             if (Strings.isNullOrEmpty(output)) {
+                logger.printf(Level.WARN, "No reviews found for the product with ASIN %s", asin);
                 stringBuilder.append(String.format("<h3>No reviews found for the product with asin number: %s.</h3><br /> \n", asin));
             } else {
                 stringBuilder.append(output);
@@ -119,12 +127,14 @@ public class DataProcessor {
             output = qaList.toString(asin);
 
             if (Strings.isNullOrEmpty(output)) {
+                logger.printf(Level.WARN, "No questions and answers found for the product with ASIN %s", asin);
                 stringBuilder.append(String.format("<h3>No questions and answers found for the product with asin number: %s.</h3><br /> \n", asin));
             } else {
                 stringBuilder.append(output);
             }
         }
         else  {
+            logger.printf(Level.WARN, "The value of ASIN is null");
             stringBuilder.append("<h3 style=\"color: red;\">No Input was given. Provide \"ASIN\" number. </h3>\n");
         }
 
@@ -156,9 +166,11 @@ public class DataProcessor {
                     }
                 }
             } else {
+                logger.printf(Level.WARN, "No reviews found having the term %s", term);
                 stringBuilder.append(String.format("<h3 style=\"color: red;\">No term i.e. \"%s\" found. </h3> \n", term));
             }
-        }else  {
+        } else  {
+            logger.printf(Level.WARN, "The value of Term is null");
             stringBuilder.append("<h3 style=\"color: red;\">No Input was given. Provide \"TERM\" number. </h3>\n");
         }
 

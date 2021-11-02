@@ -25,7 +25,7 @@ public class HTTPServerTest {
     @Test
     public void validateRequest_nullRequest_send400() {
         StringWriter actualStringWriter = new StringWriter();
-        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter), null);
+        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter));
 
         try {
             Method processMethod = HTTPServer.class.getDeclaredMethod("validateRequest", String.class, WebResponse.class);
@@ -47,7 +47,7 @@ public class HTTPServerTest {
     @Test
     public void validateRequest_badRequest_send400() {
         StringWriter actualStringWriter = new StringWriter();
-        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter), null);
+        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter));
 
         try {
             Method processMethod = HTTPServer.class.getDeclaredMethod("validateRequest", String.class, WebResponse.class);
@@ -69,7 +69,7 @@ public class HTTPServerTest {
     @Test
     public void validateRequest_putMethod_send405() {
         StringWriter actualStringWriter = new StringWriter();
-        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter), null);
+        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter));
 
         try {
             Method processMethod = HTTPServer.class.getDeclaredMethod("validateRequest", String.class, WebResponse.class);
@@ -91,7 +91,7 @@ public class HTTPServerTest {
     @Test
     public void validateRequest_pageNotFound_send404() {
         StringWriter actualStringWriter = new StringWriter();
-        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter), null);
+        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter));
 
         try {
             Method processMethod = HTTPServer.class.getDeclaredMethod("validateRequest", String.class, WebResponse.class);
@@ -124,7 +124,7 @@ public class HTTPServerTest {
     @Test
     public void validateRequest_versionIncorrect_send505() {
         StringWriter actualStringWriter = new StringWriter();
-        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter), null);
+        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter));
 
         try {
             Field configField = HTTPServer.class.getDeclaredField("handlers");
@@ -155,7 +155,7 @@ public class HTTPServerTest {
     @Test
     public void validateRequest_validRequest_returnTrue() {
         StringWriter actualStringWriter = new StringWriter();
-        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter), null);
+        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter));
 
         try {
             Field configField = HTTPServer.class.getDeclaredField("handlers");

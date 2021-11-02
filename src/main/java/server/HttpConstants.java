@@ -3,6 +3,11 @@ package server;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Constant fields required by a Http server.
+ *
+ * @author Palak Jain
+ */
 public class HttpConstants {
     public static final String GET = "GET";
     public static final String POST = "POST";
