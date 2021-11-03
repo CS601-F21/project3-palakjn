@@ -2,7 +2,7 @@ package applications.slack;
 
 import applications.slack.configuration.SlackConfig;
 import applications.slack.configuration.SlackConstants;
-import applications.slack.controller.SlackHandler;
+import applications.slack.controller.SlackBotHandler;
 import configuration.Config;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -57,7 +57,7 @@ public class SlackApplication {
 
         logger.printf(Level.INFO, "Starting the server");
         HTTPServer server = new HTTPServer(SlackConstants.PORT);
-        server.addMapping(SlackConstants.SLACK_BOT_URI, new SlackHandler());
+        server.addMapping(SlackConstants.SLACK_BOT_URI, new SlackBotHandler());
         server.startup();
     }
 

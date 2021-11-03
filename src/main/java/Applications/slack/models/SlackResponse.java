@@ -13,16 +13,6 @@ import java.util.List;
 public class SlackResponse {
     private boolean ok;
     private String error;
-    @SerializedName(value = "response_metadata")
-    private ResponseMetadata responseMetadata;
-
-    private class ResponseMetadata {
-        private List<String> messages;
-
-        public List<String> getMessages() {
-            return messages;
-        }
-    }
 
     /**
      * @return the status of a POST call
@@ -32,14 +22,22 @@ public class SlackResponse {
     }
 
     /**
-     * @return the error message received from Slack API
+     * @return the error message corresponding to the response received from Slack API
      */
     public String getError() {
-        List<String> messages =  responseMetadata.getMessages();
         String errorMessage = null;
 
-        if(messages != null && messages.size() > 0) {
-            errorMessage = String.format("<h3 style=\"color: red;\">Error while sending message to a channel %s: %s, Description: %s</h3>", SlackConstants.CHANNEL, error, String.join(", ", messages));
+        if(error.equals(SlackConstants.NO_CHANNEL)) {
+            errorMessage = "<h3 style=\"color: red;\">Error while posting a message to slack. No channel being provided.</h3>";
+        }
+        else if(error.equals(SlackConstants.NO_TEXT)) {
+            errorMessage = String.format("<h3 style=\"color: red;\">Provide a message to post to a channel %s</h3>", SlackConstants.CHANNEL);
+        }
+        else if(error.equals(SlackConstants.WRONG_CHANNEL)) {
+            errorMessage = String.format("<h3 style=\"color: red;\">Error while posting a message to slack. No channel with the name %s exist.</h3>", SlackConstants.CHANNEL);
+        }
+        else if(error.equals(SlackConstants.NO_TOKEN)) {
+            errorMessage = "<h3 style=\"color: red;\">Error while posting a message to slack. Authentication failed.</h3>";
         }
         else {
             errorMessage = String.format("<h3 style=\"color: red;\">Error while sending message to a channel %s: %s</h3>", SlackConstants.CHANNEL, error);

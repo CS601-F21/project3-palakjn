@@ -31,6 +31,12 @@ public class SlackConstants {
                 "\"text\": \"%s\" \n" +
             "}";
 
+    //Slack error messages
+    public static String NO_TOKEN = "invalid_auth";
+    public static String NO_CHANNEL = "invalid_arguments";
+    public static String WRONG_CHANNEL = "channel_not_found";
+    public static String NO_TEXT = "no_text";
+
     //XHTML pages
     public static final String SLACK_BOT_FORM = "<!DOCTYPE html>\n" +
             "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +

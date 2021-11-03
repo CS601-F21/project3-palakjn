@@ -18,7 +18,6 @@ public class SlackSystemTest {
         readConfig();
         Assumptions.assumeTrue(verifyConfig());
 
-
         //Creating a thread which will start the server and listening for requests
         Thread thread = new Thread(SlackSystemTest::startServer);
         thread.start();
@@ -70,34 +69,6 @@ public class SlackSystemTest {
 
                 </body>
                 </html>
-                """;
-
-        Assertions.assertEquals(expected, actual);
-    }
-
-    @Test
-    public void POST_slackBotPath_emptyMessage_returnErrorResponse() {
-        String body = ServerUtil.getBody("message","");
-
-        String actual = ServerUtil.doPost(9090,"localhost", "/slackbot", body);
-
-        String expected = """
-               HTTP/1.1 200 OK
-               Connection: close\s
-               
-               <!DOCTYPE html>
-               <html xmlns="http://www.w3.org/1999/xhtml">
-               <head>
-                 <title>Slack Bot</title>
-               </head>
-               <body>
-               <form class="form" action="/slackbot" method="post">
-               <input type="text" name="message" placeholder="Message"></input><br />
-               <button  type"submit">Send</button>
-               </form><br /><br /><br />
-               <h3 style="color: red;">Error while sending message to a channel app-testing: no_text</h3>\s
-               </body>
-               </html>
                 """;
 
         Assertions.assertEquals(expected, actual);
