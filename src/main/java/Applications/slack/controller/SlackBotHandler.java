@@ -115,8 +115,6 @@ public class SlackBotHandler extends Handler {
      * @return The success/failure response.
      */
     private String verifyResponse(String response) {
-        //TODO: Write unit test for this function
-
         String message = "";
 
         SlackResponse slackResponse = JsonManager.fromJson(response, SlackResponse.class);

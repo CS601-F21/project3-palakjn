@@ -185,6 +185,32 @@ public class SearchSystemTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    public void shutdown_invalidToken_returnErrorPage() {
+        String actual = ServerUtil.doPost(8080,"localhost", "/shutdown", "passcode=1234");
+
+        String expected = """
+                HTTP/1.1 200 OK
+                Connection: close\s
+                                
+                <!DOCTYPE html>
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                <head>
+                  <title>Review Search</title>
+                </head>
+                <body>
+                <form action="/shutdown" method="post">
+                <input type="password" name="passcode" placeholder="Passcode"></input><br />
+                <button  type"submit">Shutdown</button>
+                </form>
+                <h3 style="color: red;">Wrong passcode. Try Again..!</h3>
+                </body>
+                </html>
+                """;
+
+        Assertions.assertEquals(expected, actual);
+    }
+
     private static void initConfig(SearchConfig searchConfig) {
         try {
             Field configField = SearchApplication.class.getDeclaredField("configuration");

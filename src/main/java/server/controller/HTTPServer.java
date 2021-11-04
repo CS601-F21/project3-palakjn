@@ -66,7 +66,7 @@ public class HTTPServer {
             try {
                 //accept a new connection
                 this.socket = serverSocket.accept();
-                System.out.println("New connection from " + socket.getInetAddress());
+                logger.printf(Level.INFO,"New connection from " + socket.getInetAddress());
 
                 threadPool.execute(() -> handleRequest(socket));
             } catch(IOException ioException) {

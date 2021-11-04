@@ -1,10 +1,8 @@
 package applications.slack;
 
 import applications.ServerUtil;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import applications.slack.configuration.SlackConstants;
+import org.junit.jupiter.api.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -80,7 +78,7 @@ public class SlackSystemTest {
 
         String actual = ServerUtil.doPost(9090,"localhost", "/slackbot", body);
 
-        String expected = """
+        String expected = String.format("""
                 HTTP/1.1 200 OK
                 Connection: close\s
                                
@@ -94,7 +92,33 @@ public class SlackSystemTest {
                 <input type="text" name="message" placeholder="Message"></input><br />
                 <button  type"submit">Send</button>
                 </form><br /><br /><br />
-                <h3 style="color: green;">Hooray! Message was sent to a channel: app-testing.</h3>\s
+                <h3 style="color: green;">Hooray! Message was sent to a channel: %s.</h3>\s
+                </body>
+                </html>
+                """, SlackConstants.CHANNEL);
+
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void shutdown_invalidToken_returnErrorPage() {
+        String actual = ServerUtil.doPost(9090,"localhost", "/shutdown", "passcode=1234");
+
+        String expected = """
+                HTTP/1.1 200 OK
+                Connection: close\s
+                                
+                <!DOCTYPE html>
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                <head>
+                  <title>Review Search</title>
+                </head>
+                <body>
+                <form action="/shutdown" method="post">
+                <input type="password" name="passcode" placeholder="Passcode"></input><br />
+                <button  type"submit">Shutdown</button>
+                </form>
+                <h3 style="color: red;">Wrong passcode. Try Again..!</h3>
                 </body>
                 </html>
                 """;

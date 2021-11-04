@@ -6,7 +6,7 @@
 
   "slack" : {
     "accessToken": "",
-    "channel": "app-testing"
+    "channel": "webclients"
   }
 
 }
