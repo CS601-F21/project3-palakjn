@@ -7,8 +7,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import server.models.WebRequest;
 import server.models.WebResponse;
+import utils.HTMLValidator;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class FindHandlerTest {
     private static FindHandler findHandler;
@@ -41,12 +44,23 @@ public class FindHandlerTest {
                 <body>
                 <form class="form" action="/find" method="post">
                 <input type="text" name="asin" placeholder="ASIN Number"></input><br />
-                <button  type"submit">Search</button>
+                <button  type="submit">Search</button>
                 </form>
                 </body>
                 </html>""");
 
         Assertions.assertEquals(expectedStringWriter.toString(), actualStringWriter.toString());
+    }
+
+    @Test
+    public void doGet_validInputs_validXHTMLResponse() {
+        WebRequest webRequest = new WebRequest(null);
+        StringWriter actualStringWriter = new StringWriter();
+        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter));
+
+        findHandler.doGet(webRequest, webResponse);
+
+        isXHTML(actualStringWriter.toString());
     }
 
     @Test
@@ -93,11 +107,11 @@ public class FindHandlerTest {
                     <body>
                     <form class="form" action="/find" method="post">
                     <input type="text" name="asin" placeholder="ASIN Number"></input><br />
-                    <button  type"submit">Search</button>
+                    <button  type="submit">Search</button>
                     </form><br /><br /><br />
                     <h3>Asin number: 12345. Reviews: </h3><br />
                     <p>1) ReviewerID: null, ReviewerName: null, ReviewerText: The dog and the cat</p>
-                    <h3>Asin number: 12345. Questions & Answers: </h3><br />
+                    <h3>Asin number: 12345. Questions and Answers: </h3><br />
                     <p>1) Question: How are you, Answer: I am fine</p>
                     \s
                     </body>
@@ -109,8 +123,32 @@ public class FindHandlerTest {
         }
     }
 
+    @Test
+    public void doPost_validInput_validXHTMLResponse() {
+        BufferedReader reader = new BufferedReader(new StringReader("12345"));
+        WebRequest webRequest = new WebRequest(reader);
+        StringWriter actualStringWriter = new StringWriter();
+        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter));
+        webRequest.addHeader("Content-Length:", "5");
+
+        try {
+            findHandler.doPost(webRequest, webResponse);
+
+            isXHTML(actualStringWriter.toString());
+        } catch (IOException ioException) {
+            System.err.println(ioException.getMessage());
+        }
+    }
+
     @AfterAll
     public static void clean() {
         TestInitialization.clean();
+    }
+
+    private void isXHTML(String actual) {
+        List<String> lines = Arrays.stream(actual.split("\n")).toList();
+        actual = String.join("", lines.subList(3, lines.size()));
+
+        Assertions.assertTrue(HTMLValidator.isValid(actual));
     }
 }

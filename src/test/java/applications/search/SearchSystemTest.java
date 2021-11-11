@@ -5,10 +5,13 @@ import applications.search.configuration.SearchConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import utils.HTMLValidator;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 public class SearchSystemTest {
     private static SearchApplication searchApplication = new SearchApplication();
@@ -31,23 +34,32 @@ public class SearchSystemTest {
         //Main thread will make a Get request to a server
         String actual = ServerUtil.doGet(8080,"localhost", "/find");
 
-        String expected = "HTTP/1.1 200 OK\n" +
-                "Connection: close \n" +
-                "\n" +
-                "<!DOCTYPE html>\n" +
-                "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-                "<head>\n" +
-                "  <title>Find</title>\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "<form class=\"form\" action=\"/find\" method=\"post\">\n" +
-                "<input type=\"text\" name=\"asin\" placeholder=\"ASIN Number\"></input><br />\n" +
-                "<button  type\"submit\">Search</button>\n" +
-                "</form>\n" +
-                "</body>\n" +
-                "</html>\n";
+        String expected = """
+                HTTP/1.1 200 OK
+                Connection: close\s
+
+                <!DOCTYPE html>
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                <head>
+                  <title>Find</title>
+                </head>
+                <body>
+                <form class="form" action="/find" method="post">
+                <input type="text" name="asin" placeholder="ASIN Number"></input><br />
+                <button  type="submit">Search</button>
+                </form>
+                </body>
+                </html>
+                """;
 
         Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void GET_findPath_validXHTMLResponse() {
+        //Main thread will make a Get request to a server
+        String actual = ServerUtil.doGet(8080,"localhost", "/find");
+        isXHTML(actual);
     }
 
     @Test
@@ -66,12 +78,19 @@ public class SearchSystemTest {
                 "<body>\n" +
                 "<form class=\"form\" action=\"/reviewsearch\" method=\"post\">\n" +
                 "<input type=\"text\" name=\"term\" placeholder=\"Term\"></input><br />\n" +
-                "<button  type\"submit\">Search</button>\n" +
+                "<button  type=\"submit\">Search</button>\n" +
                 "</form>\n" +
                 "</body>\n" +
                 "</html>\n";
 
         Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void GET_reviewPath_validXHTMLResponse() {
+        //Main thread will make a Get request to a server
+        String actual = ServerUtil.doGet(8080,"localhost", "/reviewsearch");
+        isXHTML(actual);
     }
 
     @Test
@@ -98,34 +117,50 @@ public class SearchSystemTest {
     }
 
     @Test
+    public void GET_wrongPath_validXHTMLResponse() {
+        //Main thread will make a Get request to a server
+        String actual = ServerUtil.doGet(8080, "localhost", "/qasearch");
+        isXHTML(actual);
+    }
+
+    @Test
     public void POST_findPath_validASIN_returnResponse() {
         String body = ServerUtil.getBody("asin","120401325X");
 
         String actual = ServerUtil.doPost(8080,"localhost", "/find", body);
 
-        String expected = "HTTP/1.1 200 OK\n" +
-                "Connection: close \n" +
-                "\n" +
-                "<!DOCTYPE html>\n" +
-                "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-                "<head>\n" +
-                "  <title>Find</title>\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "<form class=\"form\" action=\"/find\" method=\"post\">\n" +
-                "<input type=\"text\" name=\"asin\" placeholder=\"ASIN Number\"></input><br />\n" +
-                "<button  type\"submit\">Search</button>\n" +
-                "</form><br /><br /><br />\n" +
-                "<h3>Asin number: 120401325X. Reviews: </h3><br />\n" +
-                "<p>1) ReviewerID: APX47D16JOP7H, ReviewerName: RLH, ReviewerText: se make using  home button easy. My daughter and I both like m.  I would purchase m again. Well worth  price.</p>\n" +
-                "<h3>Asin number: 120401325X. Questions & Answers: </h3><br />\n" +
-                "<p>1) Question: can in it be used abroad with a different carrier?, Answer: Yes</p>\n" +
-                "<p>2) Question: Is this phone brand new and NOT a mini?, Answer:  phone we received was exactly as described - a brand new Samsung SIII I747, AT&T branded but unlocked (and not a mini). It has worked perfectly on our AT&T service in USA for over a year (4G where available). I suggest you email  vendor and get a response email from m confirming  exact item you will receive.</p>\n" +
-                " \n" +
-                "</body>\n" +
-                "</html>\n";
+        String expected = """
+                HTTP/1.1 200 OK
+                Connection: close\s
+                                
+                <!DOCTYPE html>
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                <head>
+                  <title>Find</title>
+                </head>
+                <body>
+                <form class="form" action="/find" method="post">
+                <input type="text" name="asin" placeholder="ASIN Number"></input><br />
+                <button  type="submit">Search</button>
+                </form><br /><br /><br />
+                <h3>Asin number: 120401325X. Reviews: </h3><br />
+                <p>1) ReviewerID: APX47D16JOP7H, ReviewerName: RLH, ReviewerText: se make using  home button easy. My daughter and I both like m.  I would purchase m again. Well worth  price.</p>
+                <h3>Asin number: 120401325X. Questions and Answers: </h3><br />
+                <p>1) Question: can in it be used abroad with a different carrier?, Answer: Yes</p>
+                <p>2) Question: Is this phone brand new and NOT a mini?, Answer:  phone we received was exactly as described - a brand new Samsung SIII I747, AT&amp;T branded but unlocked (and not a mini). It has worked perfectly on our AT&amp;T service in USA for over a year (4G where available). I suggest you email  vendor and get a response email from m confirming  exact item you will receive.</p>
+                \s
+                </body>
+                </html>
+                """;
 
         Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void POST_findPath_validASIN_validXHTMLResponse() {
+        String body = ServerUtil.getBody("asin","120401325X");
+        String actual = ServerUtil.doPost(8080,"localhost", "/find", body);
+        isXHTML(actual);
     }
 
     @Test
@@ -145,7 +180,7 @@ public class SearchSystemTest {
                 "<body>\n" +
                 "<form class=\"form\" action=\"/reviewsearch\" method=\"post\">\n" +
                 "<input type=\"text\" name=\"term\" placeholder=\"Term\"></input><br />\n" +
-                "<button  type\"submit\">Search</button>\n" +
+                "<button  type=\"submit\">Search</button>\n" +
                 "</form><br /><br /><br />\n" +
                 "<p>1) ASIN Number: 1204013256. ReviewerID: ASY55RVNIL0UD, ReviewerName: emily l., ReviewerText: se stickers work like  review says y do. y stick on great and y stay on  phone. y are super stylish and I can share m with my sister. :).</p>\n" +
                 "<p>2) ASIN Number: 1204013256. ReviewerID: A2TMXE2AFO7ONB, ReviewerName: Erica, ReviewerText: se are awesome and make my phone look so stylish! I have only used one so far and have had it on for almost a year! CAN YOU BELIEVE THAT! ONE YEAR!! Great quality!.</p>\n" +
@@ -156,6 +191,13 @@ public class SearchSystemTest {
                 "</html>\n";
 
         Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void POST_reviewPath_validTerm_validXHTMLResponse() {
+        String body = ServerUtil.getBody("term","great");
+        String actual = ServerUtil.doPost(8080,"localhost", "/reviewsearch", body);
+        isXHTML(actual);
     }
 
     @Test
@@ -175,7 +217,7 @@ public class SearchSystemTest {
                 "<body>\n" +
                 "<form class=\"form\" action=\"/reviewsearch\" method=\"post\">\n" +
                 "<input type=\"text\" name=\"term\" placeholder=\"Term\"></input><br />\n" +
-                "<button  type\"submit\">Search</button>\n" +
+                "<button  type=\"submit\">Search</button>\n" +
                 "</form><br /><br /><br />\n" +
                 "<p>1) ASIN Number: 1204013256. ReviewerID: AWJ0WZQYMYFQ4, ReviewerName: JM, ReviewerText: Item arrived in great time and was in perfect condition. However, I ordered se buttons because y were a great deal and included a FREE screen protector. I never received one. Though its not a big deal, it would've been nice to get it since y claim it comes with one..</p>\n" +
                 " \n" +
@@ -183,6 +225,13 @@ public class SearchSystemTest {
                 "</html>\n";
 
         Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void POST_reviewPath_specialCharTerm_validXHTMLResponse() {
+        String body = ServerUtil.getBody("term","fr!ee");
+        String actual = ServerUtil.doPost(8080,"localhost", "/reviewsearch", body);
+        isXHTML(actual);
     }
 
     @Test
@@ -201,7 +250,7 @@ public class SearchSystemTest {
                 <body>
                 <form action="/shutdown" method="post">
                 <input type="password" name="passcode" placeholder="Passcode"></input><br />
-                <button  type"submit">Shutdown</button>
+                <button type="submit">Shutdown</button>
                 </form>
                 <h3 style="color: red;">Wrong passcode. Try Again..!</h3>
                 </body>
@@ -209,6 +258,13 @@ public class SearchSystemTest {
                 """;
 
         Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void shutdown_invalidToken_validXHTMLResponse() {
+        String actual = ServerUtil.doPost(8080,"localhost", "/shutdown", "passcode=1234");
+
+        isXHTML(actual);
     }
 
     private static void initConfig(SearchConfig searchConfig) {
@@ -244,5 +300,12 @@ public class SearchSystemTest {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException exception) {
             System.err.println(exception.getMessage());
         }
+    }
+
+    private void isXHTML(String actual) {
+        List<String> lines = Arrays.stream(actual.split("\n")).toList();
+        actual = String.join("", lines.subList(3, lines.size()));
+
+        Assertions.assertTrue(HTMLValidator.isValid(actual));
     }
 }

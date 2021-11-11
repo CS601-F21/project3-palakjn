@@ -22,7 +22,7 @@ public class QAListTest {
 
     @Test
     public void toString_existAsin_returnValidResponse() {
-        String expected = "<h3>Asin number: 12345. Questions & Answers: </h3><br />\n" +
+        String expected = "<h3>Asin number: 12345. Questions and Answers: </h3><br />\n" +
                     "<p>1) Question: How are you, Answer: I am fine</p>\n";
         String actual = qaList.toString("12345");
 
