@@ -1,5 +1,7 @@
 package server.models;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 import server.HttpConstants;
 import java.io.PrintWriter;
 
@@ -10,6 +12,7 @@ import java.io.PrintWriter;
  */
 public class WebResponse {
     private PrintWriter writer;
+    private static final Logger logger = (Logger) LogManager.getLogger(WebResponse.class);
 
     public WebResponse(PrintWriter writer) {
         this.writer = writer;
@@ -36,7 +39,7 @@ public class WebResponse {
      * @param response String response in XHTML format
      */
     public void send(String response) {
-        writer.println(response);
+       writer.println(response);
     }
 
     /**

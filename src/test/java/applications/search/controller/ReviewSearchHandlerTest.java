@@ -7,8 +7,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import server.models.WebRequest;
 import server.models.WebResponse;
+import utils.HTMLValidator;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class ReviewSearchHandlerTest {
     private static ReviewSearchHandler reviewSearchHandler;
@@ -40,12 +43,23 @@ public class ReviewSearchHandlerTest {
                 "<body>\n" +
                 "<form class=\"form\" action=\"/reviewsearch\" method=\"post\">\n" +
                 "<input type=\"text\" name=\"term\" placeholder=\"Term\"></input><br />\n" +
-                "<button  type\"submit\">Search</button>\n" +
+                "<button  type=\"submit\">Search</button>\n" +
                 "</form>\n" +
                 "</body>\n" +
                 "</html>");
 
         Assertions.assertEquals(expectedStringWriter.toString(), actualStringWriter.toString());
+    }
+
+    @Test
+    public void doGet_validInputs_validXHTMLResponse() {
+        WebRequest webRequest = new WebRequest(null);
+        StringWriter actualStringWriter = new StringWriter();
+        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter));
+
+        reviewSearchHandler.doGet(webRequest, webResponse);
+
+        isXHTML(actualStringWriter.toString());
     }
 
     @Test
@@ -91,7 +105,7 @@ public class ReviewSearchHandlerTest {
                     "<body>\n" +
                     "<form class=\"form\" action=\"/reviewsearch\" method=\"post\">\n" +
                     "<input type=\"text\" name=\"term\" placeholder=\"Term\"></input><br />\n" +
-                    "<button  type\"submit\">Search</button>\n" +
+                    "<button  type=\"submit\">Search</button>\n" +
                     "</form><br /><br /><br />\n" +
                     "<p>1) ASIN Number: 12345. ReviewerID: null, ReviewerName: null, ReviewerText: The dog and the cat.</p>\n" +
                     "<p>2) ASIN Number: 67891. ReviewerID: null, ReviewerName: null, ReviewerText: Hello, the sample review.</p>\n \n" +
@@ -104,8 +118,32 @@ public class ReviewSearchHandlerTest {
         }
     }
 
+    @Test
+    public void doPost_validInput_validXHTMLResponse() {
+        BufferedReader reader = new BufferedReader(new StringReader("the"));
+        WebRequest webRequest = new WebRequest(reader);
+        StringWriter actualStringWriter = new StringWriter();
+        WebResponse webResponse = new WebResponse(new PrintWriter(actualStringWriter));
+        webRequest.addHeader("Content-Length:", "3");
+
+        try {
+            reviewSearchHandler.doPost(webRequest, webResponse);
+
+            isXHTML(actualStringWriter.toString());
+        } catch (IOException ioException) {
+            System.err.println(ioException.getMessage());
+        }
+    }
+
     @AfterAll
     public static void clean() {
         TestInitialization.clean();
+    }
+
+    private void isXHTML(String actual) {
+        List<String> lines = Arrays.stream(actual.split("\n")).toList();
+        actual = String.join("", lines.subList(3, lines.size()));
+
+        Assertions.assertTrue(HTMLValidator.isValid(actual));
     }
 }

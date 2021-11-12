@@ -42,7 +42,7 @@ public class HttpConstants {
             <body>
             <form action="/shutdown" method="post">
             <input type="password" name="passcode" placeholder="Passcode"></input><br />
-            <button  type"submit">Shutdown</button>
+            <button type="submit">Shutdown</button>
             </form>
             </body>
             </html>""";
@@ -68,7 +68,7 @@ public class HttpConstants {
             <body>
             <form action="/shutdown" method="post">
             <input type="password" name="passcode" placeholder="Passcode"></input><br />
-            <button  type"submit">Shutdown</button>
+            <button type="submit">Shutdown</button>
             </form>
             <h3 style="color: red;">%s</h3>
             </body>

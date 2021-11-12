@@ -47,7 +47,7 @@ public class DataProcessorTest {
         String asin = "12345";
         String expectedOutput = "<h3>Asin number: 12345. Reviews: </h3><br />\n" +
                     "<p>1) ReviewerID: null, ReviewerName: null, ReviewerText: The dog and the cat</p>\n" +
-                    "<h3>Asin number: 12345. Questions & Answers: </h3><br />\n" +
+                    "<h3>Asin number: 12345. Questions and Answers: </h3><br />\n" +
                     "<p>1) Question: How are you, Answer: I am fine</p>\n";
         String actualOutput = dataProcessor.findAsin(asin);
 

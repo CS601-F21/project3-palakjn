@@ -1,5 +1,6 @@
 package server.controller;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;

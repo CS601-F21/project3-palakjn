@@ -3,9 +3,12 @@ package applications.slack;
 import applications.ServerUtil;
 import applications.slack.configuration.SlackConstants;
 import org.junit.jupiter.api.*;
+import utils.HTMLValidator;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 public class SlackSystemTest {
     private static SlackApplication slackApplication;
@@ -38,13 +41,21 @@ public class SlackSystemTest {
                 <body>
                 <form class="form" action="/slackbot" method="post">
                 <input type="text" name="message" placeholder="Message"></input><br />
-                <button  type"submit">Send</button>
+                <button type="submit">Send</button>
                 </form>
                 </body>
                 </html>
                 """;
 
         Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void GET_slackBotPath_validXHTMLResponse() {
+        //Main thread will make a Get request to a server
+        String actual = ServerUtil.doGet(9090,"localhost", "/slackbot");
+
+        isXHTML(actual);
     }
 
     @Test
@@ -73,6 +84,14 @@ public class SlackSystemTest {
     }
 
     @Test
+    public void GET_wrongPath_validXHTMLResponse() {
+        //Main thread will make a Get request to a server
+        String actual = ServerUtil.doGet(9090, "localhost", "/slack");
+
+        isXHTML(actual);
+    }
+
+    @Test
     public void POST_slackBotPath_validMessage_returnResponse() {
         String body = ServerUtil.getBody("message","Testing!");
 
@@ -90,7 +109,7 @@ public class SlackSystemTest {
                 <body>
                 <form class="form" action="/slackbot" method="post">
                 <input type="text" name="message" placeholder="Message"></input><br />
-                <button  type"submit">Send</button>
+                <button type="submit">Send</button>
                 </form><br /><br /><br />
                 <h3 style="color: green;">Hooray! Message was sent to a channel: %s.</h3>\s
                 </body>
@@ -98,6 +117,15 @@ public class SlackSystemTest {
                 """, SlackConstants.CHANNEL);
 
         Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void POST_slackBotPath_validMessage_validXHTMLResponse() {
+        String body = ServerUtil.getBody("message","Testing!");
+
+        String actual = ServerUtil.doPost(9090,"localhost", "/slackbot", body);
+
+        isXHTML(actual);
     }
 
     @Test
@@ -116,7 +144,7 @@ public class SlackSystemTest {
                 <body>
                 <form action="/shutdown" method="post">
                 <input type="password" name="passcode" placeholder="Passcode"></input><br />
-                <button  type"submit">Shutdown</button>
+                <button type="submit">Shutdown</button>
                 </form>
                 <h3 style="color: red;">Wrong passcode. Try Again..!</h3>
                 </body>
@@ -124,6 +152,13 @@ public class SlackSystemTest {
                 """;
 
         Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void shutdown_invalidToken_validXHTMLResponse() {
+        String actual = ServerUtil.doPost(9090,"localhost", "/shutdown", "passcode=1234");
+
+        isXHTML(actual);
     }
 
     private static void readConfig() {
@@ -158,5 +193,12 @@ public class SlackSystemTest {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException exception) {
             System.err.println(exception.getMessage());
         }
+    }
+
+    private void isXHTML(String actual) {
+        List<String> lines = Arrays.stream(actual.split("\n")).toList();
+        actual = String.join("", lines.subList(3, lines.size()));
+
+        Assertions.assertTrue(HTMLValidator.isValid(actual));
     }
 }
